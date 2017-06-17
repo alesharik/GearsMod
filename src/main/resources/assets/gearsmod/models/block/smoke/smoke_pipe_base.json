@@ -1,0 +1,87 @@
+{
+  "parent": "block/cube_all",
+  "elements": [
+    {
+      "from": [
+        4,
+        10,
+        4
+      ],
+      "to": [
+        12,
+        14,
+        12
+      ],
+      "faces": {
+        "down": {
+          "texture": "#all",
+          "cullface": "down"
+        },
+        "up": {
+          "texture": "#all",
+          "cullface": "up"
+        },
+        "north": {
+          "texture": "#north",
+          "cullface": "north"
+        },
+        "south": {
+          "texture": "#all",
+          "cullface": "south"
+        },
+        "west": {
+          "texture": "#west",
+          "cullface": "west"
+        },
+        "east": {
+          "texture": "#east",
+          "cullface": "east"
+        }
+      }
+    },
+    {
+      "from": [
+        12,
+        14,
+        12
+      ],
+      "to": [
+        4,
+        10,
+        4
+      ],
+      "faces": {
+        "down": {
+          "texture": "#all",
+          "cullface": "up"
+        },
+        "up": {
+          "texture": "#all",
+          "cullface": "down"
+        },
+        "north": {
+          "texture": "#north",
+          "cullface": "south"
+        },
+        "south": {
+          "texture": "#all",
+          "cullface": "north"
+        },
+        "west": {
+          "texture": "#west",
+          "cullface": "east"
+        },
+        "east": {
+          "texture": "#west",
+          "cullface": "west"
+        }
+      }
+    }
+  ],
+  "textures": {
+    "all": "gearsmod:blocks/smoke/smoke_pipe_side",
+    "north": "gearsmod:blocks/smoke/smoke_pipe_side_180deg",
+    "west": "gearsmod:blocks/smoke/smoke_pipe_side_270deg",
+    "east": "gearsmod:blocks/smoke/smoke_pipe_side_90deg"
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "parent": "block/cube",
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        4,
+        16
+      ],
+      "faces": {
+        "down": {
+          "texture": "#down",
+          "cullface": "down"
+        },
+        "up": {
+          "texture": "#up",
+          "cullface": "up"
+        },
+        "north": {
+          "texture": "#north",
+          "cullface": "north"
+        },
+        "south": {
+          "texture": "#north",
+          "cullface": "south"
+        },
+        "west": {
+          "texture": "#north",
+          "cullface": "west"
+        },
+        "east": {
+          "texture": "#north",
+          "cullface": "east"
+        }
+      }
+    },
+    {
+      "from": [
+        16,
+        4,
+        16
+      ],
+      "to": [
+        0,
+        0,
+        0
+      ],
+      "faces": {
+        "down": {
+          "texture": "#down",
+          "cullface": "up"
+        },
+        "up": {
+          "texture": "#up",
+          "cullface": "down"
+        },
+        "north": {
+          "texture": "#north",
+          "cullface": "south"
+        },
+        "south": {
+          "texture": "#north",
+          "cullface": "north"
+        },
+        "west": {
+          "texture": "#north",
+          "cullface": "east"
+        },
+        "east": {
+          "texture": "#north",
+          "cullface": "west"
+        }
+      }
+    }
+  ],
+  "textures": {
+    "particle": "gearsmod:blocks/energy/simple_solar_panel_top",
+    "down": "gearsmod:blocks/energy/simple_solar_panel_bottom",
+    "up": "gearsmod:blocks/energy/simple_solar_panel_top",
+    "north": "gearsmod:blocks/energy/simple_solar_panel_side",
+    "east": "gearsmod:blocks/energy/simple_solar_panel_side",
+    "south": "gearsmod:blocks/energy/simple_solar_panel_side",
+    "west": "gearsmod:blocks/energy/simple_solar_panel_side"
+  }
+}

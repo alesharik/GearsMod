@@ -1,0 +1,33 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "gearsmod:smoke/chimney.obj"
+  },
+  "variants": {
+    "facing": {
+      "east": {
+        "y": 90
+      },
+      "south": {
+        "y": 180
+      },
+      "west": {
+        "y": 270
+      },
+      "north": {
+        "y": 0
+      }
+    },
+    "working": {
+      "false": {
+        "model": "gearsmod:smoke/chimney.obj"
+      },
+      "true": {
+        "model": "gearsmod:smoke/chimney.obj"
+      }
+    },
+    "inventory": [
+      {}
+    ]
+  }
+}

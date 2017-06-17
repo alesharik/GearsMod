@@ -1,0 +1,59 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "gearsmod:smoke/smoke_pipe_base"
+  },
+  "variants": {
+    "connection_up": {
+      "false": {},
+      "true": {
+        "submodel": "gearsmod:smoke/smoke_pipe_connection_top",
+        "x": 90,
+        "y": 90,
+        "z": 0
+      }
+    },
+    "connection_down": {
+      "false": {},
+      "true": {
+        "submodel": "gearsmod:smoke/smoke_pipe_connection_bottom",
+        "x": 90,
+        "y": 0
+      }
+    },
+    "connection_east": {
+      "false": {},
+      "true": {
+        "submodel": "gearsmod:smoke/smoke_pipe_connection_east",
+        "x": 0,
+        "y": 90
+      }
+    },
+    "connection_west": {
+      "false": {},
+      "true": {
+        "submodel": "gearsmod:smoke/smoke_pipe_connection_west",
+        "y": 270
+      }
+    },
+    "connection_north": {
+      "false": {},
+      "true": {
+        "submodel": "gearsmod:smoke/smoke_pipe_connection",
+        "x": 0,
+        "y": 0
+      }
+    },
+    "connection_south": {
+      "false": {},
+      "true": {
+        "submodel": "gearsmod:smoke/smoke_pipe_connection_south",
+        "x": 0,
+        "y": 180
+      }
+    },
+    "normal": [
+      {}
+    ]
+  }
+}

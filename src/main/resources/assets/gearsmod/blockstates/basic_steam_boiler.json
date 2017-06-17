@@ -1,0 +1,30 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "gearsmod:basic_steam_boiler_off"
+  },
+  "variants": {
+    "facing": {
+      "east": {
+        "y": 90
+      },
+      "south": {
+        "y": 180
+      },
+      "west": {
+        "y": 270
+      },
+      "north": {
+        "y": 0
+      }
+    },
+    "working": {
+      "false": {
+        "model": "gearsmod:basic_steam_boiler_off"
+      },
+      "true": {
+        "model": "gearsmod:basic_steam_boiler_on"
+      }
+    }
+  }
+}

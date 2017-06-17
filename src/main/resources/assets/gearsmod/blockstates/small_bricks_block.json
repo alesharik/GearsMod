@@ -1,0 +1,11 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "gearsmod:decor/small_bricks_block"
+  },
+  "variants": {
+    "normal": [
+      {}
+    ]
+  }
+}

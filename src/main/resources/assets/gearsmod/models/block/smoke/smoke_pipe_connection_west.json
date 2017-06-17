@@ -1,0 +1,63 @@
+{
+  "parent": "block/cube_all",
+  "elements": [
+    {
+      "from": [
+        4,
+        10,
+        0
+      ],
+      "to": [
+        12,
+        14,
+        4
+      ],
+      "faces": {
+        "down": {
+          "texture": "#down"
+        },
+        "up": {
+          "texture": "#all"
+        },
+        "west": {
+          "texture": "#south"
+        },
+        "east": {
+          "texture": "#north"
+        }
+      }
+    },
+    {
+      "from": [
+        12,
+        14,
+        4
+      ],
+      "to": [
+        4,
+        10,
+        0
+      ],
+      "faces": {
+        "down": {
+          "texture": "#down"
+        },
+        "up": {
+          "texture": "#all"
+        },
+        "west": {
+          "texture": "#south"
+        },
+        "east": {
+          "texture": "#north"
+        }
+      }
+    }
+  ],
+  "textures": {
+    "all": "gearsmod:blocks/smoke/smoke_pipe_side_90deg",
+    "south": "gearsmod:blocks/smoke/smoke_pipe_side",
+    "north": "gearsmod:blocks/smoke/smoke_pipe_side_180deg",
+    "down": "gearsmod:blocks/smoke/smoke_pipe_side_270deg"
+  }
+}

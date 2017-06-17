@@ -1,0 +1,18 @@
+[
+  {
+    "modid": "gearsmod",
+    "name": "Gears Mod",
+    "description": "Mod about gears, steam, etc.",
+    "version": "1.0-SNAPSHOT",
+    "mcversion": "${mcversion}",
+    "url": "",
+    "updateUrl": "",
+    "authorList": [
+      "alesharik"
+    ],
+    "credits": "",
+    "logoFile": "",
+    "screenshots": [],
+    "dependencies": []
+  }
+]

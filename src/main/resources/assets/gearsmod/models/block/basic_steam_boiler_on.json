@@ -1,0 +1,31 @@
+{
+  "parent": "block/cube",
+  "display": {
+    "firstperson_righthand": {
+      "rotation": [
+        0,
+        135,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.40,
+        0.40,
+        0.40
+      ]
+    }
+  },
+  "textures": {
+    "particle": "gearsmod:blocks/basic_steam_boiler_front_on",
+    "down": "gearsmod:blocks/basic_steam_boiler_bottom",
+    "up": "gearsmod:blocks/basic_steam_boiler_top",
+    "north": "gearsmod:blocks/basic_steam_boiler_front_on",
+    "east": "gearsmod:blocks/basic_steam_boiler_side",
+    "south": "gearsmod:blocks/basic_steam_boiler_back",
+    "west": "gearsmod:blocks/basic_steam_boiler_side"
+  }
+}
