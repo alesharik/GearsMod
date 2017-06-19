@@ -20,19 +20,26 @@ package com.alesharik.gearsmod.proxy;
 import com.alesharik.gearsmod.GearsMod;
 import com.alesharik.gearsmod.block.ModBlocks;
 import com.alesharik.gearsmod.capability.smoke.SmokeCapability;
+import com.alesharik.gearsmod.gui.GuiHandler;
 import com.alesharik.gearsmod.item.ModItems;
 import com.alesharik.gearsmod.tileEntity.ModTileEntities;
+import com.alesharik.gearsmod.util.ExecutionUtils;
+import com.alesharik.gearsmod.util.field.SimpleTileEntityFieldStore;
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.item.Item;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class CommonProxy {
+public class CommonProxy implements ExecutionUtils.Executor {
     @SidedProxy
     private static CommonProxy proxy;
 
@@ -41,13 +48,17 @@ public class CommonProxy {
     }
 
     public void preInit(FMLPreInitializationEvent e) {
-
+        ExecutionUtils.initialize(proxy);
     }
 
     public void init(FMLInitializationEvent event) {
         ModTileEntities.register();
 
         SmokeCapability.register();
+
+        NetworkRegistry.INSTANCE.registerGuiHandler(GearsMod.getInstance(), GuiHandler.getInstance());
+
+        GearsMod.getNetworkWrapper().registerMessage(SimpleTileEntityFieldStore.FieldUpdateMessage.Handler.class, SimpleTileEntityFieldStore.FieldUpdateMessage.class, 0, Side.SERVER);
     }
 
     public void onRegisterBlock(RegistryEvent.Register<Block> registry) {
@@ -56,6 +67,13 @@ public class CommonProxy {
 
     public void onRegisterItem(RegistryEvent.Register<Item> register) {
         ModItems.register(register.getRegistry());
+    }
+
+    @Override
+    public void executeTask(MessageContext context, Runnable runnable) {
+        if(context.getServerHandler().playerEntity.world instanceof WorldServer) {
+            ((WorldServer) context.getServerHandler().playerEntity.world).addScheduledTask(runnable);
+        }
     }
 
     public static class ServerProxy extends CommonProxy {
@@ -67,6 +85,8 @@ public class CommonProxy {
         public void init(FMLInitializationEvent event) {
             super.init(event);
 
+            GearsMod.getNetworkWrapper().registerMessage(SimpleTileEntityFieldStore.FieldUpdateMessage.Handler.class, SimpleTileEntityFieldStore.FieldUpdateMessage.class, 0, Side.CLIENT);
+
             ModItems.clientRegister();
             ModTileEntities.clientRegister();
         }
@@ -76,6 +96,15 @@ public class CommonProxy {
             super.preInit(e);
 
             OBJLoader.INSTANCE.addDomain(GearsMod.MODID);
+        }
+
+        @SideOnly(Side.CLIENT)
+        @Override
+        public void executeTask(MessageContext context, Runnable runnable) {
+            if(context.side == Side.CLIENT)
+                Minecraft.getMinecraft().addScheduledTask(runnable);
+            else
+                super.executeTask(context, runnable);
         }
     }
 }

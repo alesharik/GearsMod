@@ -17,30 +17,51 @@
 
 package com.alesharik.gearsmod.tileEntity.steam;
 
+import com.alesharik.gearsmod.GearsMod;
 import com.alesharik.gearsmod.block.BlockMachine;
 import com.alesharik.gearsmod.capability.smoke.SmokeCapability;
 import com.alesharik.gearsmod.capability.smoke.SmokeHandler;
-import net.minecraft.tileentity.TileEntity;
+import com.alesharik.gearsmod.tileEntity.FieldTileEntity;
+import com.alesharik.gearsmod.util.field.SimpleTileEntityFieldStore;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidTank;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidTankProperties;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public final class BasicSteamBoilerTileEntity extends TileEntity {
+public final class BasicSteamBoilerTileEntity extends FieldTileEntity {
     private final SmokeHandler smokeHandler;
+    private final IFluidHandler fluidHandler;
+    private final ItemStackHandler coalItemStackHandler;
 
     public BasicSteamBoilerTileEntity() {
+        super();
         smokeHandler = new SmokeHandler(10000, false, true);
+        fluidHandler = new FluidTank(FluidRegistry.WATER, 5000, 10000);
+        coalItemStackHandler = new ItemStackHandler();
+    }
+
+    @Override
+    public void onLoad() {
+        store = new SimpleTileEntityFieldStore(pos, world, GearsMod.getNetworkWrapper());
     }
 
     @Override
     public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing) {
-        if(facing == world.getBlockState(pos).getValue(BlockMachine.FACING).getOpposite() && capability == SmokeCapability.DEFAULT_CAPABILITY) {
+        if(facing == world.getBlockState(pos).getValue(BlockMachine.FACING).getOpposite() && capability == SmokeCapability.DEFAULT_CAPABILITY)
             return true;
-        } else {
-            return false;
-        }
+        else if((facing == world.getBlockState(pos).getValue(BlockMachine.FACING).rotateY() || facing == world.getBlockState(pos).getValue(BlockMachine.FACING).rotateYCCW() || facing == null)
+                && capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)
+            return true;
+        return false;
     }
 
     @SuppressWarnings("unchecked")
@@ -48,7 +69,25 @@ public final class BasicSteamBoilerTileEntity extends TileEntity {
     public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
         if(facing == EnumFacing.SOUTH && capability == SmokeCapability.DEFAULT_CAPABILITY)
             return (T) smokeHandler;
+        else if((facing == world.getBlockState(pos).getValue(BlockMachine.FACING).rotateY() || facing == world.getBlockState(pos).getValue(BlockMachine.FACING).rotateYCCW() || facing == null)
+                && capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)
+            return (T) fluidHandler;
+        else if(facing == null && capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+            return (T) coalItemStackHandler;
         else
             return null;
+    }
+
+    @Nonnull
+    public IFluidTankProperties getWaterProperty() {
+        return fluidHandler.getTankProperties()[0];
+    }
+
+    public ItemStackHandler getCoalItemStackHandler() {
+        return coalItemStackHandler;
+    }
+
+    public void addLiquid(int count) {
+        fluidHandler.fill(new FluidStack(FluidRegistry.WATER, count), true);
     }
 }
