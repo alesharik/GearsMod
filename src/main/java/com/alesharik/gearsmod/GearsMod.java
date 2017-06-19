@@ -28,11 +28,13 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nonnull;
 
@@ -53,6 +55,7 @@ public class GearsMod {
     private static SimpleNetworkWrapper networkWrapper;
     @Mod.Instance
     private static GearsMod instance;
+    private static Logger logger;
 
     public GearsMod() {
         MinecraftForge.EVENT_BUS.register(this);
@@ -78,8 +81,13 @@ public class GearsMod {
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         networkWrapper = new SimpleNetworkWrapper(MODID);
-
+        logger = event.getModLog();
         CommonProxy.getProxy().preInit(event);
+    }
+
+    @EventHandler
+    public void postInit(FMLPostInitializationEvent event) {
+        CommonProxy.getProxy().postInit(event);
     }
 
     @SubscribeEvent

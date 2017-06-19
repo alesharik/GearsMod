@@ -21,6 +21,7 @@ import com.alesharik.gearsmod.GearsMod;
 import com.alesharik.gearsmod.block.ModBlocks;
 import com.alesharik.gearsmod.capability.smoke.SmokeCapability;
 import com.alesharik.gearsmod.gui.GuiHandler;
+import com.alesharik.gearsmod.integration.IntegrationManager;
 import com.alesharik.gearsmod.item.ModItems;
 import com.alesharik.gearsmod.tileEntity.ModTileEntities;
 import com.alesharik.gearsmod.util.ExecutionUtils;
@@ -33,6 +34,7 @@ import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -49,6 +51,7 @@ public class CommonProxy implements ExecutionUtils.Executor {
 
     public void preInit(FMLPreInitializationEvent e) {
         ExecutionUtils.initialize(proxy);
+        IntegrationManager.preInit();
     }
 
     public void init(FMLInitializationEvent event) {
@@ -59,6 +62,11 @@ public class CommonProxy implements ExecutionUtils.Executor {
         NetworkRegistry.INSTANCE.registerGuiHandler(GearsMod.getInstance(), GuiHandler.getInstance());
 
         GearsMod.getNetworkWrapper().registerMessage(SimpleTileEntityFieldStore.FieldUpdateMessage.Handler.class, SimpleTileEntityFieldStore.FieldUpdateMessage.class, 0, Side.SERVER);
+        IntegrationManager.init();
+    }
+
+    public void postInit(FMLPostInitializationEvent event) {
+        IntegrationManager.postInit();
     }
 
     public void onRegisterBlock(RegistryEvent.Register<Block> registry) {
