@@ -17,6 +17,7 @@
 
 package com.alesharik.gearsmod;
 
+import com.alesharik.gearsmod.proxy.CommonProxy;
 import com.alesharik.gearsmod.util.ModSecurityManager;
 
 import java.security.AccessControlException;
@@ -39,5 +40,20 @@ class ModSecurityManagerImpl extends ModSecurityManager {
         if("com.alesharik".startsWith(name) || "java".startsWith(name) || "sun".startsWith(name))
             return;
         throw new AccessControlException("Access to logger denied!");
+    }
+
+    @Override
+    public void checkSetExecutor() {
+        if(getCallerClass(1).equals(CommonProxy.class))
+            return;
+        throw new AccessControlException("Change executor not allowed!");
+    }
+
+    @Override
+    public void checkExecuteTask() {
+        String name = getCallerClass(1).getPackage().getName();
+        if("com.alesharik".startsWith(name) || "java".startsWith(name) || "sun".startsWith(name))
+            return;
+        throw new AccessControlException("Access to executor denied!");
     }
 }

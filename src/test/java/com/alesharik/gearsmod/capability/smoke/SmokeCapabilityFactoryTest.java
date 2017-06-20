@@ -15,18 +15,20 @@
  *     along with GearsMod.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.alesharik.gearsmod.util;
+package com.alesharik.gearsmod.capability.smoke;
 
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertFalse;
 
-public class SecurityManagerNotInitializedExceptionTest {
+public class SmokeCapabilityFactoryTest {
     @Test
-    public void constructorTest() throws Exception {
-        SecurityManagerNotInitializedException exception = new SecurityManagerNotInitializedException();
-        assertEquals("Mod SecurityManager not initialized!", exception.getMessage());
-        assertNotNull(exception.getStackTrace());
+    public void callTest() throws Exception {
+        SmokeStorage smokeHandler = new SmokeCapabilityFactory().call();
+        assertFalse(smokeHandler.canExtract());
+        assertFalse(smokeHandler.canReceive());
+        assertEquals(smokeHandler.getMaxSmokeAmount(), 1000);
+        assertEquals(smokeHandler.getSmokeAmount(), 0);
     }
 }

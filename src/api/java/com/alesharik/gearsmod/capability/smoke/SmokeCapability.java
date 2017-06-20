@@ -25,6 +25,10 @@ public final class SmokeCapability {
     @CapabilityInject(SmokeStorage.class)
     public static Capability<SmokeStorage> DEFAULT_CAPABILITY = null;
 
+    private SmokeCapability() {
+        throw new UnsupportedOperationException();
+    }
+
     public static void register() {
         CapabilityManager.INSTANCE.register(SmokeStorage.class, new SmokeCapabilityStorage(), new SmokeCapabilityFactory());
     }

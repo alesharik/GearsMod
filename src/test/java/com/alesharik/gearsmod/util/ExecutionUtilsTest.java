@@ -17,17 +17,17 @@
 
 package com.alesharik.gearsmod.util;
 
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.lang.reflect.Field;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
-public class ModSecurityManagerTest {
+public class ExecutionUtilsTest {
     private ModSecurityManager securityManager;
 
     @SuppressWarnings("unchecked")
@@ -39,52 +39,39 @@ public class ModSecurityManagerTest {
         securityManagerReference.set(null);
 
         securityManager = mock(ModSecurityManager.class);
-    }
-
-    @Test
-    public void setInstanceTest() throws Exception {
         ModSecurityManager.setInstance(securityManager);
-        assertEquals(securityManager, ModSecurityManager.getInstance());
+
+        Field field = ExecutionUtils.class.getDeclaredField("executor");
+        field.setAccessible(true);
+        AtomicReference<ExecutionUtils.Executor> executorReference = (AtomicReference<ExecutionUtils.Executor>) field.get(null);
+        executorReference.set(null);
     }
 
     @Test(expected = IllegalStateException.class)
-    public void multipleSetInstanceTest() throws Exception {
-        ModSecurityManager.setInstance(securityManager);
-        ModSecurityManager.setInstance(securityManager);
-    }
-
-    @Test(expected = SecurityManagerNotInitializedException.class)
-    public void getInstanceTestWithNotInitializedSecurityManager() throws Exception {
-        ModSecurityManager.getInstance();
+    public void setExecutorTest() throws Exception {
+        ExecutionUtils.initialize((context, runnable) -> {
+        });
+        verify(securityManager).checkSetExecutor();
+        ExecutionUtils.initialize((context, runnable) -> {
+        });
     }
 
     @Test
-    public void getCallerClassTest() throws Exception {
-        ModSecurityManager securityManager = new ModSecurityManager() {
-            @Override
-            public void checkSetLogger() {
+    public void executeTask() throws Exception {
+        ExecutionUtils.Executor executor = mock(ExecutionUtils.Executor.class);
 
-            }
+        ExecutionUtils.initialize(executor);
+        MessageContext messageContext = mock(MessageContext.class);
+        Runnable runnable = mock(Runnable.class);
 
-            @Override
-            public void checkGetLogger() {
+        ExecutionUtils.executeTask(messageContext, runnable);
 
-            }
-
-            @Override
-            public void checkSetExecutor() {
-
-            }
-
-            @Override
-            public void checkExecuteTask() {
-
-            }
-        };
-
-        Function<Void, Class<?>> function = aVoid -> securityManager.getCallerClass(0);
-
-        assertEquals(ModSecurityManagerTest.class, function.apply(null));
+        verify(securityManager).checkExecuteTask();
+        verify(executor).executeTask(messageContext, runnable);
     }
 
+    @Test(expected = ExecutorNotInitializedException.class)
+    public void executeWithoutInitializationTest() throws Exception {
+        ExecutionUtils.executeTask(mock(MessageContext.class), mock(Runnable.class));
+    }
 }

@@ -47,5 +47,6 @@ public final class ConnectionProperties {
     }
 
     private ConnectionProperties() {
+        throw new UnsupportedOperationException();
     }
 }

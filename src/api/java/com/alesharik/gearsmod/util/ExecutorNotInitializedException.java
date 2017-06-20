@@ -17,16 +17,8 @@
 
 package com.alesharik.gearsmod.util;
 
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-public class SecurityManagerNotInitializedExceptionTest {
-    @Test
-    public void constructorTest() throws Exception {
-        SecurityManagerNotInitializedException exception = new SecurityManagerNotInitializedException();
-        assertEquals("Mod SecurityManager not initialized!", exception.getMessage());
-        assertNotNull(exception.getStackTrace());
+public class ExecutorNotInitializedException extends RuntimeException {
+    ExecutorNotInitializedException() {
+        super("Executor not initialized!");
     }
 }

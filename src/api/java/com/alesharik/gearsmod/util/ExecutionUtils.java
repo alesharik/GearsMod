@@ -19,19 +19,46 @@ package com.alesharik.gearsmod.util;
 
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.ThreadSafe;
+import java.util.concurrent.atomic.AtomicReference;
+
+/**
+ * This class allows you to execute tasks in client/server thread
+ */
+@ThreadSafe
 public final class ExecutionUtils {
-    private static Executor executor;
+    private static final AtomicReference<Executor> executor = new AtomicReference<>(null);
 
-    public static void initialize(Executor executor) {
-        if(ExecutionUtils.executor != null)
+    /**
+     * DO NOT USE THIS
+     */
+    public static void initialize(@Nonnull Executor executor) {
+        ModSecurityManager.getInstance().checkSetExecutor();
+
+        if(ExecutionUtils.executor.get() != null)
             throw new IllegalStateException();
-        ExecutionUtils.executor = executor;
+        ExecutionUtils.executor.set(executor);
     }
 
-    public static void executeTask(MessageContext context, Runnable runnable) {
-        executor.executeTask(context, runnable);
+    /**
+     * Execute task on server/client thread
+     *
+     * @param context  message context
+     * @param runnable the task
+     * @throws ExecutorNotInitializedException if executor not initialized
+     */
+    public static void executeTask(@Nonnull MessageContext context, @Nonnull Runnable runnable) {
+        ModSecurityManager.getInstance().checkExecuteTask();
+
+        if(executor.get() == null)
+            throw new ExecutorNotInitializedException();
+        executor.get().executeTask(context, runnable);
     }
 
+    /**
+     * This class used for execute tasks
+     */
     public interface Executor {
         void executeTask(MessageContext context, Runnable runnable);
     }

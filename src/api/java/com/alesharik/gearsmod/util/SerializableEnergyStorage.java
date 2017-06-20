@@ -52,5 +52,7 @@ public class SerializableEnergyStorage extends EnergyStorage implements INBTSeri
     @Override
     public void deserializeNBT(NBTTagCompound nbt) {
         energy = nbt.getInteger("energy");
+        if(energy > getMaxEnergyStored())
+            energy = getMaxEnergyStored();
     }
 }

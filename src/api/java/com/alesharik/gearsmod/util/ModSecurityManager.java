@@ -17,6 +17,7 @@
 
 package com.alesharik.gearsmod.util;
 
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nonnull;
@@ -62,6 +63,16 @@ public abstract class ModSecurityManager extends SecurityManager {
      * Check access for {@link ModLoggerHolder#getModLogger()}
      */
     public abstract void checkGetLogger();
+
+    /**
+     * Check access for {@link ExecutionUtils#initialize(ExecutionUtils.Executor)}
+     */
+    public abstract void checkSetExecutor();
+
+    /**
+     * Check access for {@link ExecutionUtils#executeTask(MessageContext, Runnable)}
+     */
+    public abstract void checkExecuteTask();
 
     @Nonnull
     protected Class<?> getCallerClass(int depth) {

@@ -22,21 +22,21 @@ import net.minecraft.nbt.NBTTagInt;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 class SmokeCapabilityStorage implements Capability.IStorage<SmokeStorage> {
-    @Nullable
+    @Nonnull
     @Override
-    public NBTBase writeNBT(Capability<SmokeStorage> capability, SmokeStorage instance, EnumFacing side) {
+    public NBTBase writeNBT(@Nullable Capability<SmokeStorage> capability, SmokeStorage instance, @Nullable EnumFacing side) {
         return new NBTTagInt(instance.getSmokeAmount());
     }
 
     @Override
-    public void readNBT(Capability<SmokeStorage> capability, SmokeStorage instance, EnumFacing side, NBTBase nbt) {
-        if(instance instanceof SmokeHandler) {
-            ((SmokeHandler) instance).smokeAmount = (((NBTTagInt) nbt).getInt());
-        } else {
+    public void readNBT(@Nullable Capability<SmokeStorage> capability, @Nonnull SmokeStorage instance, @Nullable EnumFacing side, @Nonnull NBTBase nbt) {
+        if(instance instanceof SmokeHandler)
+            ((SmokeHandler) instance).smokeAmount = ((NBTTagInt) nbt).getInt();
+        else
             throw new IllegalArgumentException("Cannot deserialize custom realisation! Try to extends from SmokeHandler, not SmokeStorage");
-        }
     }
 }

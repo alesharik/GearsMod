@@ -22,11 +22,12 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class SecurityManagerNotInitializedExceptionTest {
+public class ExecutorNotInitializedExceptionTest {
     @Test
     public void constructorTest() throws Exception {
-        SecurityManagerNotInitializedException exception = new SecurityManagerNotInitializedException();
-        assertEquals("Mod SecurityManager not initialized!", exception.getMessage());
+        ExecutorNotInitializedException exception = new ExecutorNotInitializedException();
+
+        assertEquals("Executor not initialized!", exception.getMessage());
         assertNotNull(exception.getStackTrace());
     }
 }
