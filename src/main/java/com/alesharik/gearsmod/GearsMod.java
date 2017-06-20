@@ -80,6 +80,8 @@ public class GearsMod {
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         networkWrapper = new SimpleNetworkWrapper(MODID);
+        NetworkWrapperHolder.NETWORK_WRAPPER_ATOMIC_REFERENCE.set(networkWrapper);
+
         ModLoggerHolder.setModLogger(event.getModLog());
 
         CommonProxy.getProxy().preInit(event);
@@ -104,14 +106,10 @@ public class GearsMod {
     @SubscribeEvent
     public void onRegisterBlock(RegistryEvent.Register<Block> event) {
         CommonProxy.getProxy().onRegisterBlock(event);
-
-        getModLogger().debug("Blocks registered!");
     }
 
     @SubscribeEvent
     public void onRegisterItem(RegistryEvent.Register<Item> event) {
         CommonProxy.getProxy().onRegisterItem(event);
-
-        getModLogger().debug("Items registered!");
     }
 }

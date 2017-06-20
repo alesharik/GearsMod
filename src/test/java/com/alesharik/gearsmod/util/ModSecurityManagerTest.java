@@ -80,9 +80,14 @@ public class ModSecurityManagerTest {
             public void checkExecuteTask() {
 
             }
+
+            @Override
+            public void checkGetNetworkWrapper() {
+
+            }
         };
 
-        Function<Void, Class<?>> function = aVoid -> securityManager.getCallerClass(0);
+        Function<Void, Class<?>> function = aVoid -> securityManager.getCallerClass(1);
 
         assertEquals(ModSecurityManagerTest.class, function.apply(null));
     }

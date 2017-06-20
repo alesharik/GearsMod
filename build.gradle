@@ -48,9 +48,27 @@ minecraft {
     mappings = "snapshot_20161220"
 }
 
+repositories {
+    maven {
+        name = "sonatype"
+        url = "https://oss.sonatype.org/content/repositories/snapshots/"
+    }
+    maven {
+        name 'TheOneProbe repo'
+        url "http://maven.tterrag.com/"
+    }
+    maven {
+        name = "JEI repo"
+        url "http://dvs1.progwml6.com/files/maven"
+    }
+}
+
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.10'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '2.0.40-beta'
+    compile group: 'mcjty.theoneprobe', name: 'TheOneProbe', version: '1.1x-1.4.7-57'
+    compile group: 'mcjty.th'
+    compile group: 'mezz.jei', name: 'jei_1.11.2', version: '4.5.0.289'
 }
 
 processResources {

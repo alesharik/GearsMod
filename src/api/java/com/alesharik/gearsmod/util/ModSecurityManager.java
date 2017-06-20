@@ -17,6 +17,7 @@
 
 package com.alesharik.gearsmod.util;
 
+import com.alesharik.gearsmod.NetworkWrapperHolder;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import org.apache.logging.log4j.Logger;
 
@@ -75,8 +76,13 @@ public abstract class ModSecurityManager extends SecurityManager {
      */
     public abstract void checkExecuteTask();
 
+    /**
+     * Check access for {@link NetworkWrapperHolder#getNetworkWrapper()}
+     */
+    public abstract void checkGetNetworkWrapper();
+
     @Nonnull
     protected Class<?> getCallerClass(int depth) {
-        return getClassContext()[3 + depth];
+        return getClassContext()[2 + depth];
     }
 }

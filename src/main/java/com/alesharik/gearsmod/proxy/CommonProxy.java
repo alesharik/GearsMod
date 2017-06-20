@@ -19,9 +19,12 @@ package com.alesharik.gearsmod.proxy;
 
 import com.alesharik.gearsmod.GearsMod;
 import com.alesharik.gearsmod.block.ModBlocks;
+import com.alesharik.gearsmod.capability.fluid.FluidSynchronizationMessage;
 import com.alesharik.gearsmod.capability.smoke.SmokeCapability;
+import com.alesharik.gearsmod.capability.smoke.SmokeChangeMessage;
 import com.alesharik.gearsmod.gui.GuiHandler;
 import com.alesharik.gearsmod.integration.IntegrationManager;
+import com.alesharik.gearsmod.integration.theoneprobe.TheOneProbeIntegrationModule;
 import com.alesharik.gearsmod.item.ModItems;
 import com.alesharik.gearsmod.tileEntity.ModTileEntities;
 import com.alesharik.gearsmod.util.ExecutionUtils;
@@ -38,6 +41,7 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -50,6 +54,8 @@ public class CommonProxy implements ExecutionUtils.Executor {
     }
 
     public void preInit(FMLPreInitializationEvent e) {
+        IntegrationManager.addIntegrationModule(new TheOneProbeIntegrationModule());
+
         ExecutionUtils.initialize(proxy);
         IntegrationManager.preInit();
     }
@@ -61,7 +67,10 @@ public class CommonProxy implements ExecutionUtils.Executor {
 
         NetworkRegistry.INSTANCE.registerGuiHandler(GearsMod.getInstance(), GuiHandler.getInstance());
 
-        GearsMod.getNetworkWrapper().registerMessage(SimpleTileEntityFieldStore.FieldUpdateMessage.Handler.class, SimpleTileEntityFieldStore.FieldUpdateMessage.class, 0, Side.SERVER);
+        SimpleNetworkWrapper networkWrapper = GearsMod.getNetworkWrapper();
+        networkWrapper.registerMessage(SimpleTileEntityFieldStore.FieldUpdateMessage.Handler.class, SimpleTileEntityFieldStore.FieldUpdateMessage.class, 0, Side.SERVER);
+        networkWrapper.registerMessage(SmokeChangeMessage.Handler.class, SmokeChangeMessage.class, 0, Side.SERVER);
+        networkWrapper.registerMessage(FluidSynchronizationMessage.Handler.class, FluidSynchronizationMessage.class, 0, Side.SERVER);
         IntegrationManager.init();
     }
 
@@ -93,7 +102,10 @@ public class CommonProxy implements ExecutionUtils.Executor {
         public void init(FMLInitializationEvent event) {
             super.init(event);
 
-            GearsMod.getNetworkWrapper().registerMessage(SimpleTileEntityFieldStore.FieldUpdateMessage.Handler.class, SimpleTileEntityFieldStore.FieldUpdateMessage.class, 0, Side.CLIENT);
+            SimpleNetworkWrapper networkWrapper = GearsMod.getNetworkWrapper();
+            networkWrapper.registerMessage(SimpleTileEntityFieldStore.FieldUpdateMessage.Handler.class, SimpleTileEntityFieldStore.FieldUpdateMessage.class, 0, Side.CLIENT);
+            networkWrapper.registerMessage(SmokeChangeMessage.Handler.class, SmokeChangeMessage.class, 0, Side.CLIENT);
+            networkWrapper.registerMessage(FluidSynchronizationMessage.Handler.class, FluidSynchronizationMessage.class, 0, Side.CLIENT);
 
             ModItems.clientRegister();
             ModTileEntities.clientRegister();

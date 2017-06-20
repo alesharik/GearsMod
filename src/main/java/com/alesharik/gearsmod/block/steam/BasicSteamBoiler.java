@@ -53,36 +53,55 @@ public final class BasicSteamBoiler extends BlockMachine {
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         if(!worldIn.isRemote) {
-            ItemStack itemStack = playerIn.getHeldItem(hand);
             BasicSteamBoilerTileEntity tileEntity = (BasicSteamBoilerTileEntity) worldIn.getTileEntity(pos);
             if(tileEntity == null)
                 return false;
-            FluidStack contents = tileEntity.getWaterProperty().getContents();
-            if(itemStack.getItem() == Items.WATER_BUCKET && contents != null && tileEntity.getWaterProperty().getCapacity() - contents.amount >= 1000) {
-                itemStack.setCount(-1);
-                playerIn.inventory.addItemStackToInventory(new ItemStack(Items.BUCKET));
-                tileEntity.addLiquid(1000);
-            } else {
-                IItemHandler capability = tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-                if(capability == null)
-                    return false;
-                ItemStack stackInSlot = capability.getStackInSlot(0);
-                if(TileEntityFurnace.isItemFuel(itemStack) && stackInSlot.getItem() == itemStack.getItem() && stackInSlot.getCount() < stackInSlot.getMaxStackSize()) {
-                    int maxDelta = stackInSlot.getMaxStackSize() - stackInSlot.getCount();
-                    int delta = maxDelta - itemStack.getCount();
-                    if(delta < 0) {
-                        itemStack.setCount(itemStack.getCount() + delta);
-                        stackInSlot.setCount(stackInSlot.getMaxStackSize());
-                    } else if(delta >= 0) {
-                        playerIn.setHeldItem(hand, ItemStack.EMPTY);
-                        stackInSlot.setCount(stackInSlot.getCount() + itemStack.getCount());
-                    }
-                    return true;
-                } else {
-                    playerIn.openGui(GearsMod.getInstance(), ModGuis.BASIC_STEAM_BOILER.getGuiId(), worldIn, pos.getX(), pos.getY(), pos.getZ());
-                }
-            }
+
+            ItemStack playerHeldItem = playerIn.getHeldItem(hand);
+            FluidStack waterTankContents = tileEntity.getWaterProperty().getContents();
+            if(tryHandleAsBucket(playerIn, tileEntity, playerHeldItem, waterTankContents)) return true;
+
+            IItemHandler capability = tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+            if(capability == null)
+                return false;
+
+            ItemStack burnableStack = capability.getStackInSlot(0);
+            if(tryHandleAsBurnable(playerIn, hand, playerHeldItem, burnableStack, capability)) return true;
+
+            playerIn.openGui(GearsMod.getInstance(), ModGuis.BASIC_STEAM_BOILER.getGuiId(), worldIn, pos.getX(), pos.getY(), pos.getZ());
         }
         return true;
+    }
+
+    private boolean tryHandleAsBurnable(EntityPlayer playerIn, EnumHand hand, ItemStack playerHeldItem, ItemStack burnableStack, IItemHandler handler) {
+        if(!TileEntityFurnace.isItemFuel(playerHeldItem))
+            return false;
+
+        if(TileEntityFurnace.isItemFuel(playerHeldItem) && burnableStack.getItem() == playerHeldItem.getItem() && burnableStack.getCount() < burnableStack.getMaxStackSize()) {
+            int maxDelta = burnableStack.getMaxStackSize() - burnableStack.getCount();
+            int delta = maxDelta - playerHeldItem.getCount();
+            if(delta < 0) {
+                playerHeldItem.setCount(playerHeldItem.getCount() + delta);
+                burnableStack.setCount(burnableStack.getMaxStackSize());
+            } else if(delta >= 0) {
+                playerIn.setHeldItem(hand, ItemStack.EMPTY);
+                burnableStack.setCount(burnableStack.getCount() + playerHeldItem.getCount());
+            }
+            return true;
+        } else if(burnableStack.getCount() <= 0) {
+            playerIn.setHeldItem(hand, ItemStack.EMPTY);
+            handler.insertItem(0, playerHeldItem, false);
+        }
+        return false;
+    }
+
+    private boolean tryHandleAsBucket(EntityPlayer playerIn, BasicSteamBoilerTileEntity tileEntity, ItemStack playerHeldItem, FluidStack waterTankContents) {
+        if(playerHeldItem.getItem() == Items.WATER_BUCKET && waterTankContents != null && tileEntity.getWaterProperty().getCapacity() - waterTankContents.amount >= 1000) {
+            playerHeldItem.setCount(playerHeldItem.getCount() - 1);//Remove 1 water bucket
+            playerIn.inventory.addItemStackToInventory(new ItemStack(Items.BUCKET));//Add 1 empty bucket
+            tileEntity.addLiquid(1000);//Add 1b water
+            return true;
+        }
+        return false;
     }
 }

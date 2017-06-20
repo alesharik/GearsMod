@@ -58,4 +58,48 @@ public final class TestUtils {
             if(!Modifier.isStatic(field.getModifiers()))
                 throw new AssertionError("All fields in utility class must be static!");
     }
+
+    public static <T> T getStaticFieldContents(Class<?> clazz, String fieldName, Class<T> cast) {
+        try {
+            Field field = getField(clazz, fieldName);
+            field.setAccessible(true);
+            return cast.cast(field.get(null));
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new Error(e);
+        }
+    }
+
+    public static void setStaticFieldContents(Class<?> clazz, String fieldName, Object object) {
+        try {
+            Field field = getField(clazz, fieldName);
+            field.setAccessible(true);
+            Field modifiersField = Field.class.getDeclaredField("modifiers");
+            modifiersField.setAccessible(true);
+            modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+            field.set(null, object);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new Error(e);
+        }
+    }
+
+    public static void setFieldContents(Object obj, String fieldName, Object object) {
+        try {
+            Field field = getField(obj.getClass(), fieldName);
+            field.setAccessible(true);
+            Field modifiersField = Field.class.getDeclaredField("modifiers");
+            modifiersField.setAccessible(true);
+            modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+            field.set(obj, object);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new Error(e);
+        }
+    }
+
+    static Field getField(Class<?> clazz, String fieldName) throws NoSuchFieldException {
+        try {
+            return clazz.getDeclaredField(fieldName);
+        } catch (NoSuchFieldException e) {
+            return clazz.getField(fieldName);
+        }
+    }
 }

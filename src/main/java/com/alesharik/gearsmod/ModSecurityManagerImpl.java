@@ -37,7 +37,7 @@ class ModSecurityManagerImpl extends ModSecurityManager {
     @Override
     public void checkGetLogger() {
         String name = getCallerClass(1).getPackage().getName();
-        if("com.alesharik".startsWith(name) || "java".startsWith(name) || "sun".startsWith(name))
+        if(name.startsWith("com.alesharik") || name.startsWith("java") || name.startsWith("sun"))
             return;
         throw new AccessControlException("Access to logger denied!");
     }
@@ -52,8 +52,16 @@ class ModSecurityManagerImpl extends ModSecurityManager {
     @Override
     public void checkExecuteTask() {
         String name = getCallerClass(1).getPackage().getName();
-        if("com.alesharik".startsWith(name) || "java".startsWith(name) || "sun".startsWith(name))
+        if(name.startsWith("com.alesharik") || name.startsWith("java") || name.startsWith("sun"))
             return;
         throw new AccessControlException("Access to executor denied!");
+    }
+
+    @Override
+    public void checkGetNetworkWrapper() {
+        String name = getCallerClass(1).getPackage().getName();
+        if(name.startsWith("com.alesharik") || name.startsWith("java") || name.startsWith("sun"))
+            return;
+        throw new AccessControlException("Access to NetWorkWrapper denied!");
     }
 }

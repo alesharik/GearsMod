@@ -43,6 +43,9 @@ public final class IntegrationManager {
         if(!module.getInfo().getSide().valid())
             throw new IllegalArgumentException("Module not support this side!");
         modules.add(module);
+        getModLogger().log(Level.INFO, "Added module " + module.getInfo().getDisplayName());
+        if(module.isEnabled())
+            getModLogger().log(Level.INFO, "Module " + module.getInfo().getDisplayName() + " enabled!");
         syncWithStage(module);
     }
 

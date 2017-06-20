@@ -55,7 +55,7 @@ public final class BasicSteamBoilerGui extends ProgressBarGuiContainer<BasicStea
         ResourceLocation location = contents.getFluid().getStill();
         location = new ResourceLocation(location.getResourceDomain(), "textures/" + location.getResourcePath() + ".png");
         bindTexture(location);
-        int height = (int) (81F / 100 * (Math.max(0, contents.amount - 1000) * 1F / waterProperty.getCapacity() * 100));
+        int height = (int) (81F / 100 * (Math.max(0, contents.amount - 1000) * 1F / (waterProperty.getCapacity() - 1000) * 100));
         drawTexturedModalRect(startX + 9, startY + 90 - height, 0, 0, 24, height);
 
         int height2 = (int) (90 * (Math.min(1000, contents.amount) * 1F / waterProperty.getCapacity()));

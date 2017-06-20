@@ -18,7 +18,10 @@
 package com.alesharik.gearsmod.tileEntity;
 
 import com.alesharik.gearsmod.util.field.FieldStore;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+
+import javax.annotation.Nonnull;
 
 /**
  * TileEntity with field store
@@ -31,5 +34,20 @@ public class FieldTileEntity extends TileEntity {
 
     public FieldStore getFieldStore() {
         return store;
+    }
+
+    @Override
+    public void readFromNBT(NBTTagCompound compound) {
+        super.readFromNBT(compound);
+        if(store != null)
+            store.deserializeNBT((NBTTagCompound) compound.getTag("store"));
+    }
+
+    @Nonnull
+    @Override
+    public NBTTagCompound writeToNBT(NBTTagCompound c) {
+        NBTTagCompound compound = super.writeToNBT(c);
+        compound.setTag("store", store.serializeNBT());
+        return compound;
     }
 }

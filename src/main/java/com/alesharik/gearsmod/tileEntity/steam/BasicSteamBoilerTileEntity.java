@@ -19,17 +19,19 @@ package com.alesharik.gearsmod.tileEntity.steam;
 
 import com.alesharik.gearsmod.GearsMod;
 import com.alesharik.gearsmod.block.BlockMachine;
+import com.alesharik.gearsmod.capability.fluid.SynchronizedFluidTank;
 import com.alesharik.gearsmod.capability.smoke.SmokeCapability;
 import com.alesharik.gearsmod.capability.smoke.SmokeHandler;
+import com.alesharik.gearsmod.capability.smoke.SmokeHandlerUpdateListener;
 import com.alesharik.gearsmod.tileEntity.FieldTileEntity;
 import com.alesharik.gearsmod.util.field.SimpleTileEntityFieldStore;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagInt;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
@@ -39,27 +41,36 @@ import javax.annotation.Nullable;
 
 public final class BasicSteamBoilerTileEntity extends FieldTileEntity {
     private final SmokeHandler smokeHandler;
-    private final IFluidHandler fluidHandler;
+    private final SynchronizedFluidTank fluidHandler;
     private final ItemStackHandler coalItemStackHandler;
 
     public BasicSteamBoilerTileEntity() {
         super();
         smokeHandler = new SmokeHandler(10000, false, true);
-        fluidHandler = new FluidTank(FluidRegistry.WATER, 5000, 10000);
+        fluidHandler = new SynchronizedFluidTank(FluidRegistry.WATER, 0, 10000);
+        fluidHandler.setTileEntity(this);
         coalItemStackHandler = new ItemStackHandler();
     }
 
     @Override
     public void onLoad() {
         store = new SimpleTileEntityFieldStore(pos, world, GearsMod.getNetworkWrapper());
+        smokeHandler.setListener(new SmokeHandlerUpdateListener(pos, world, world.getBlockState(pos).getValue(BlockMachine.FACING).getOpposite()));
+
+        fluidHandler.setTileEntity(this);
+        fluidHandler.setFacing(world.getBlockState(pos).getValue(BlockMachine.FACING).rotateY());
+
+        markDirty();
     }
 
     @Override
     public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing) {
-        if(facing == world.getBlockState(pos).getValue(BlockMachine.FACING).getOpposite() && capability == SmokeCapability.DEFAULT_CAPABILITY)
+        if((facing == null || facing == world.getBlockState(pos).getValue(BlockMachine.FACING).getOpposite()) && capability == SmokeCapability.DEFAULT_CAPABILITY)
             return true;
         else if((facing == world.getBlockState(pos).getValue(BlockMachine.FACING).rotateY() || facing == world.getBlockState(pos).getValue(BlockMachine.FACING).rotateYCCW() || facing == null)
                 && capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)
+            return true;
+        else if(facing == null && capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
             return true;
         return false;
     }
@@ -67,7 +78,7 @@ public final class BasicSteamBoilerTileEntity extends FieldTileEntity {
     @SuppressWarnings("unchecked")
     @Override
     public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
-        if(facing == EnumFacing.SOUTH && capability == SmokeCapability.DEFAULT_CAPABILITY)
+        if((facing == null || facing == EnumFacing.SOUTH) && capability == SmokeCapability.DEFAULT_CAPABILITY)
             return (T) smokeHandler;
         else if((facing == world.getBlockState(pos).getValue(BlockMachine.FACING).rotateY() || facing == world.getBlockState(pos).getValue(BlockMachine.FACING).rotateYCCW() || facing == null)
                 && capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)
@@ -89,5 +100,24 @@ public final class BasicSteamBoilerTileEntity extends FieldTileEntity {
 
     public void addLiquid(int count) {
         fluidHandler.fill(new FluidStack(FluidRegistry.WATER, count), true);
+    }
+
+    @Override
+    public void readFromNBT(NBTTagCompound compound) {
+        super.readFromNBT(compound);
+        smokeHandler.deserializeNBT((NBTTagInt) compound.getTag("smoke"));
+        NBTTagCompound fluidCompound = compound.getCompoundTag("fluid");
+        fluidHandler.readFromNBT(fluidCompound);
+    }
+
+    @Nonnull
+    @Override
+    public NBTTagCompound writeToNBT(NBTTagCompound c) {
+        NBTTagCompound compound = super.writeToNBT(c);
+        compound.setTag("smoke", smokeHandler.serializeNBT());
+        NBTTagCompound fluidCompound = new NBTTagCompound();
+        fluidHandler.writeToNBT(fluidCompound);
+        compound.setTag("fluid", fluidCompound);
+        return compound;
     }
 }

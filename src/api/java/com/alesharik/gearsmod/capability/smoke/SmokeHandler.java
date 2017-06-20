@@ -17,12 +17,16 @@
 
 package com.alesharik.gearsmod.capability.smoke;
 
-public class SmokeHandler implements SmokeStorage {
+import net.minecraft.nbt.NBTTagInt;
+import net.minecraftforge.common.util.INBTSerializable;
+
+public class SmokeHandler implements SmokeStorage, INBTSerializable<NBTTagInt> {
     protected final int maxSmokeAmount;
     protected final boolean canExtract;
     protected final boolean canReceive;
 
     protected int smokeAmount;
+    protected Listener listener;
 
     public SmokeHandler(int max, boolean canReceive, boolean canExtract) {
         this.maxSmokeAmount = max;
@@ -30,6 +34,10 @@ public class SmokeHandler implements SmokeStorage {
         this.canExtract = canExtract;
 
         this.smokeAmount = 0;
+    }
+
+    public void setListener(Listener listener) {
+        this.listener = listener;
     }
 
     @Override
@@ -61,6 +69,8 @@ public class SmokeHandler implements SmokeStorage {
         if(!simulate) {
             smokeAmount -= amount;
         }
+        if(listener != null)
+            listener.extract(amount, simulate);
         return amount;
     }
 
@@ -69,6 +79,28 @@ public class SmokeHandler implements SmokeStorage {
         if(!canReceive)
             return;
 
+        if(listener != null)
+            listener.receive(amount);
         smokeAmount += amount;
+    }
+
+    @Override
+    public NBTTagInt serializeNBT() {
+        return new NBTTagInt(smokeAmount);
+    }
+
+    @Override
+    public void deserializeNBT(NBTTagInt nbt) {
+        smokeAmount = nbt.getInt();
+        if(listener != null)
+            listener.update(smokeAmount);
+    }
+
+    public interface Listener {
+        void receive(int amount);
+
+        void extract(int amount, boolean simulate);
+
+        void update(int amount);
     }
 }
