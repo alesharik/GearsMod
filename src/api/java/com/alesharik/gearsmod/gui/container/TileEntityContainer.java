@@ -26,7 +26,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import javax.annotation.Nonnull;
 
 /**
- * This container supports progress bar update by updating //TODO
+ * This container supports progress bar update by updating store fields
  *
  * @param <T> TileEntity
  */

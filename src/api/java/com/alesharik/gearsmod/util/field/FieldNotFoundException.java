@@ -18,4 +18,7 @@
 package com.alesharik.gearsmod.util.field;
 
 public class FieldNotFoundException extends RuntimeException {
+    public FieldNotFoundException() {
+        super("Field not found!");
+    }
 }

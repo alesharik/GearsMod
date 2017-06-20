@@ -40,9 +40,10 @@ public abstract class ModSecurityManager extends SecurityManager {
      */
     @Nonnull
     public static ModSecurityManager getInstance() {
-        if(INSTANCE.get() == null)
+        ModSecurityManager securityManager = INSTANCE.get();
+        if(securityManager == null)
             throw new SecurityManagerNotInitializedException();
-        return INSTANCE.get();
+        return securityManager;
     }
 
     /**

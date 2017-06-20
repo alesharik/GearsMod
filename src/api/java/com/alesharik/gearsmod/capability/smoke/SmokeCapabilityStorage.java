@@ -26,7 +26,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 class SmokeCapabilityStorage implements Capability.IStorage<SmokeStorage> {
-    @Nonnull
     @Override
     public NBTBase writeNBT(@Nullable Capability<SmokeStorage> capability, SmokeStorage instance, @Nullable EnumFacing side) {
         return new NBTTagInt(instance.getSmokeAmount());

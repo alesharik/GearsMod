@@ -17,7 +17,6 @@
 
 package com.alesharik.gearsmod.integration;
 
-import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModAPIManager;
 import org.apache.logging.log4j.Level;
@@ -28,7 +27,8 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
-//TODO use own logger
+import static com.alesharik.gearsmod.util.ModLoggerHolder.getModLogger;
+
 @ThreadSafe
 public final class IntegrationManager {
     private static final ModAPIManager MOD_API_MANAGER = ModAPIManager.INSTANCE;
@@ -92,9 +92,9 @@ public final class IntegrationManager {
             checkModule(module);
             module.preInit();
         } catch (ModuleDisabledException | ModNotLoadedException e) {
-            FMLLog.log(Level.WARN, e.getMessage());
+            getModLogger().log(Level.WARN, e.getMessage());
         } catch (Throwable throwable) {
-            FMLLog.log(Level.WARN, throwable, "Module %s throw an exception %s in PreInit stage!", module.getInfo().getDisplayName(), throwable.toString());
+            getModLogger().log(Level.WARN, "Module " + module.getInfo().getDisplayName() + " throw an exception " + throwable.toString() + " in PreInit stage!", throwable);
         }
     }
 
@@ -103,9 +103,9 @@ public final class IntegrationManager {
             checkModule(module);
             module.init();
         } catch (ModuleDisabledException | ModNotLoadedException e) {
-            FMLLog.log(Level.WARN, e.getMessage());
+            getModLogger().log(Level.WARN, e.getMessage());
         } catch (Throwable throwable) {
-            FMLLog.log(Level.WARN, throwable, "Module %s throw an exception %s in Init stage!", module.getInfo().getDisplayName(), throwable.toString());
+            getModLogger().log(Level.WARN, "Module " + module.getInfo().getDisplayName() + " throw an exception " + throwable.toString() + " in Init stage!", throwable);
         }
     }
 
@@ -114,9 +114,9 @@ public final class IntegrationManager {
             checkModule(module);
             module.postInit();
         } catch (ModuleDisabledException | ModNotLoadedException e) {
-            FMLLog.log(Level.WARN, e.getMessage());
+            getModLogger().log(Level.WARN, e.getMessage());
         } catch (Throwable throwable) {
-            FMLLog.log(Level.WARN, throwable, "Module %s throw an exception %s in PostInit stage!", module.getInfo().getDisplayName(), throwable.toString());
+            getModLogger().log(Level.WARN, "Module " + module.getInfo().getDisplayName() + " throw an exception " + throwable.toString() + " in PostInit stage!", throwable);
         }
     }
 
