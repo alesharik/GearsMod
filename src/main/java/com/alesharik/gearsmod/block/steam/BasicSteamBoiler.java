@@ -25,7 +25,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
-import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityFurnace;
@@ -54,8 +53,7 @@ public final class BasicSteamBoiler extends BlockMachine {
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         if(!worldIn.isRemote) {
-            EntityEquipmentSlot slotIn = hand == EnumHand.MAIN_HAND ? EntityEquipmentSlot.MAINHAND : EntityEquipmentSlot.OFFHAND;
-            ItemStack itemStack = playerIn.getItemStackFromSlot(slotIn);
+            ItemStack itemStack = playerIn.getHeldItem(hand);
             BasicSteamBoilerTileEntity tileEntity = (BasicSteamBoilerTileEntity) worldIn.getTileEntity(pos);
             if(tileEntity == null)
                 return false;
@@ -76,7 +74,7 @@ public final class BasicSteamBoiler extends BlockMachine {
                         itemStack.setCount(itemStack.getCount() + delta);
                         stackInSlot.setCount(stackInSlot.getMaxStackSize());
                     } else if(delta >= 0) {
-                        playerIn.setItemStackToSlot(slotIn, ItemStack.EMPTY);
+                        playerIn.setHeldItem(hand, ItemStack.EMPTY);
                         stackInSlot.setCount(stackInSlot.getCount() + itemStack.getCount());
                     }
                     return true;

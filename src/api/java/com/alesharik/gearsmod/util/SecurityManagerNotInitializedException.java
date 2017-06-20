@@ -15,10 +15,13 @@
  *     along with GearsMod.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.alesharik.gearsmod.integration;
+package com.alesharik.gearsmod.util;
 
-class ModuleDisabledException extends RuntimeException {
-    ModuleDisabledException(IntegrationModule module) {
-        super("Module " + module.getInfo().getDisplayName() + " is disabled!", null, false, false);
+/**
+ * This exception means, what {@link ModSecurityManager} hadn't been set
+ */
+public class SecurityManagerNotInitializedException extends RuntimeException {
+    SecurityManagerNotInitializedException() {
+        super("Mod SecurityManager not initialized!");
     }
 }

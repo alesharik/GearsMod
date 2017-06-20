@@ -15,10 +15,13 @@
  *     along with GearsMod.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.alesharik.gearsmod.integration;
+package com.alesharik.gearsmod.util;
 
-class ModuleDisabledException extends RuntimeException {
-    ModuleDisabledException(IntegrationModule module) {
-        super("Module " + module.getInfo().getDisplayName() + " is disabled!", null, false, false);
+/**
+ * This exception means, what logger hadn't been set
+ */
+public final class LoggerNotInitializedException extends RuntimeException {
+    LoggerNotInitializedException() {
+        super("Logger not initialized!");
     }
 }

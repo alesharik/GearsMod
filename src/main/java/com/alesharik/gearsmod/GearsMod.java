@@ -19,6 +19,8 @@ package com.alesharik.gearsmod;
 
 import com.alesharik.gearsmod.block.ModBlocks;
 import com.alesharik.gearsmod.proxy.CommonProxy;
+import com.alesharik.gearsmod.util.ModLoggerHolder;
+import com.alesharik.gearsmod.util.ModSecurityManager;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
@@ -34,9 +36,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.apache.logging.log4j.Logger;
 
-import javax.annotation.Nonnull;
+import static com.alesharik.gearsmod.util.ModLoggerHolder.getModLogger;
 
 @Mod(modid = GearsMod.MODID, version = GearsMod.VERSION)
 public class GearsMod {
@@ -46,16 +47,19 @@ public class GearsMod {
     private static final CreativeTabs CREATIVE_TAB = new CreativeTabs("Gears mod") {
         @SideOnly(Side.CLIENT)
         @Override
-        @Nonnull
         public ItemStack getTabIconItem() {
             return new ItemStack(ModBlocks.SMALL_BRICKS_BLOCK);
         }
     };
 
     private static SimpleNetworkWrapper networkWrapper;
+
     @Mod.Instance
     private static GearsMod instance;
-    private static Logger logger;
+
+    static {
+        ModSecurityManager.setInstance(new ModSecurityManagerImpl());
+    }
 
     public GearsMod() {
         MinecraftForge.EVENT_BUS.register(this);
@@ -74,29 +78,40 @@ public class GearsMod {
     }
 
     @EventHandler
-    public void init(FMLInitializationEvent event) {
-        CommonProxy.getProxy().init(event);
+    public void preInit(FMLPreInitializationEvent event) {
+        networkWrapper = new SimpleNetworkWrapper(MODID);
+        ModLoggerHolder.setModLogger(event.getModLog());
+
+        CommonProxy.getProxy().preInit(event);
+
+        getModLogger().debug("PreInit stage completed!");
     }
 
     @EventHandler
-    public void preInit(FMLPreInitializationEvent event) {
-        networkWrapper = new SimpleNetworkWrapper(MODID);
-        logger = event.getModLog();
-        CommonProxy.getProxy().preInit(event);
+    public void init(FMLInitializationEvent event) {
+        CommonProxy.getProxy().init(event);
+
+        getModLogger().debug("Init stage completed!");
     }
 
     @EventHandler
     public void postInit(FMLPostInitializationEvent event) {
         CommonProxy.getProxy().postInit(event);
+
+        getModLogger().debug("PostInit stage completed!");
     }
 
     @SubscribeEvent
     public void onRegisterBlock(RegistryEvent.Register<Block> event) {
         CommonProxy.getProxy().onRegisterBlock(event);
+
+        getModLogger().debug("Blocks registered!");
     }
 
     @SubscribeEvent
     public void onRegisterItem(RegistryEvent.Register<Item> event) {
         CommonProxy.getProxy().onRegisterItem(event);
+
+        getModLogger().debug("Items registered!");
     }
 }

@@ -15,10 +15,18 @@
  *     along with GearsMod.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.alesharik.gearsmod.integration;
+package com.alesharik.gearsmod.util;
 
-class ModuleDisabledException extends RuntimeException {
-    ModuleDisabledException(IntegrationModule module) {
-        super("Module " + module.getInfo().getDisplayName() + " is disabled!", null, false, false);
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class LoggerNotInitializedExceptionTest {
+    @Test
+    public void constructorTest() throws Exception {
+        LoggerNotInitializedException exception = new LoggerNotInitializedException();
+        assertEquals("Logger not initialized!", exception.getMessage());
+        assertNotNull(exception.getStackTrace());
     }
 }
