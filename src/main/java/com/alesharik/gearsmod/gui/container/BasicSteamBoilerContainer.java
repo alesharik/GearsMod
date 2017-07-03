@@ -15,14 +15,12 @@
  *     along with GearsMod.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.alesharik.gearsmod.gui.server;
+package com.alesharik.gearsmod.gui.container;
 
-import com.alesharik.gearsmod.gui.container.TileEntityContainer;
 import com.alesharik.gearsmod.gui.container.slot.SlotFilteredItemHandler;
 import com.alesharik.gearsmod.tileEntity.steam.BasicSteamBoilerTileEntity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityFurnace;
@@ -31,14 +29,16 @@ import javax.annotation.Nonnull;
 
 public final class BasicSteamBoilerContainer extends TileEntityContainer<BasicSteamBoilerTileEntity> {
 
-    public BasicSteamBoilerContainer(IInventory playerInventory, BasicSteamBoilerTileEntity tileEntity) {
+    public BasicSteamBoilerContainer(EntityPlayer player, BasicSteamBoilerTileEntity tileEntity) {
         super(tileEntity);
 
         for(int x = 0; x < 9; ++x) {
-            this.addSlotToContainer(new Slot(playerInventory, x, 57 + x * 17, 102));
+            this.addSlotToContainer(new Slot(player.inventory, x, 57 + x * 17, 102));
         }
 
         this.addSlotToContainer(new SlotFilteredItemHandler(BurnableFilter.INSTANCE, tileEntity.getCoalItemStackHandler(), 0, 125, 79));
+
+        addListener(ContainerSynchronizer.newInstance(player, new int[]{0}));
     }
 
     @Override

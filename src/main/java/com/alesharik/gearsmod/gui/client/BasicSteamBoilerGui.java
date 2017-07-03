@@ -17,7 +17,7 @@
 
 package com.alesharik.gearsmod.gui.client;
 
-import com.alesharik.gearsmod.gui.server.BasicSteamBoilerContainer;
+import com.alesharik.gearsmod.gui.container.BasicSteamBoilerContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.FluidStack;
