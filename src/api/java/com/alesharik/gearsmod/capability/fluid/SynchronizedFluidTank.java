@@ -68,6 +68,33 @@ public class SynchronizedFluidTank extends FluidTank {
         }
     }
 
+    /**
+     * Works only if tile is present. Sync server data and clients
+     */
+    public void sync() {
+        if(tile == null)
+            return;
+
+        if(FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER)
+            onContentsChanged();
+        else
+            NetworkWrapperHolder.getNetworkWrapper().sendToServer(new RequestFluidSynchronizationMessage(tile.getPos(), tile.getWorld(), facing));
+    }
+
+    /**
+     * Works only if tile is present. Sync server data and clients
+     */
+    public void sync(Side side) {
+        Side effectiveSide = FMLCommonHandler.instance().getEffectiveSide();
+        if(tile == null || effectiveSide != side)
+            return;
+
+        if(effectiveSide == Side.SERVER)
+            onContentsChanged();
+        else
+            NetworkWrapperHolder.getNetworkWrapper().sendToServer(new RequestFluidSynchronizationMessage(tile.getPos(), tile.getWorld(), facing));
+    }
+
     void setAmount(String name, int amount) {
         FluidStack fluid = this.fluid;
         if(fluid == null || !fluid.getFluid().getName().equals(name)) {

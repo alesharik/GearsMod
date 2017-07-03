@@ -35,21 +35,28 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 
+import javax.annotation.Nullable;
+
 /**
  * This class require {@link com.alesharik.gearsmod.tileEntity.FieldTileEntity} as TileEntity
  */
 public final class SimpleTileEntityFieldStore implements FieldStore {
-    private final BlockPos coords;
-    private final int dimensionId;
     private final SimpleNetworkWrapper networkWrapper;
-
     private final TIntIntMap map;
+    private BlockPos coords;
+    private int dimensionId;
 
-    public SimpleTileEntityFieldStore(BlockPos coords, World world, SimpleNetworkWrapper networkWrapper) {
-        this.coords = coords;
+    public SimpleTileEntityFieldStore(SimpleNetworkWrapper networkWrapper) {
         this.networkWrapper = networkWrapper;
-        this.dimensionId = world.provider.getDimension();
         this.map = new TIntIntHashMap();
+    }
+
+    public void setBlockPos(BlockPos coords) {
+        this.coords = coords;
+    }
+
+    public void setWorld(World world) {
+        this.dimensionId = world.provider.getDimension();
     }
 
     @Override
@@ -94,7 +101,9 @@ public final class SimpleTileEntityFieldStore implements FieldStore {
     }
 
     @Override
-    public void deserializeNBT(NBTTagCompound nbt) {
+    public void deserializeNBT(@Nullable NBTTagCompound nbt) {
+        if(nbt == null)
+            return;
         map.clear();
         int[] keys = ((NBTTagIntArray) nbt.getTag("keys")).getIntArray();
         int[] vales = ((NBTTagIntArray) nbt.getTag("values")).getIntArray();
@@ -118,6 +127,9 @@ public final class SimpleTileEntityFieldStore implements FieldStore {
             this.worldId = worldId;
             this.ids = ids;
             this.values = values;
+        }
+
+        public FieldUpdateMessage() {
         }
 
         @Override

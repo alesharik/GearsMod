@@ -1,0 +1,60 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "gearsmod:steam/basic_steam_pipe_base"
+  },
+  "variants": {
+    "connection_up": {
+      "false": {},
+      "true": {
+        "submodel": "gearsmod:steam/basic_steam_pipe_connection_up",
+        "x": 0,
+        "y": 0,
+        "z": 0
+      }
+    },
+    "connection_down": {
+      "false": {},
+      "true": {
+        "submodel": "gearsmod:steam/basic_steam_pipe_connection_down",
+        "x": 0,
+        "y": 0,
+        "z": 0
+      }
+    },
+    "connection_east": {
+      "false": {},
+      "true": {
+        "submodel": "gearsmod:steam/basic_steam_pipe_connection",
+        "x": 0,
+        "y": 180
+      }
+    },
+    "connection_west": {
+      "false": {},
+      "true": {
+        "submodel": "gearsmod:steam/basic_steam_pipe_connection",
+        "y": 0
+      }
+    },
+    "connection_north": {
+      "false": {},
+      "true": {
+        "submodel": "gearsmod:steam/basic_steam_pipe_connection",
+        "x": 0,
+        "y": 90
+      }
+    },
+    "connection_south": {
+      "false": {},
+      "true": {
+        "submodel": "gearsmod:steam/basic_steam_pipe_connection",
+        "x": 0,
+        "y": 270
+      }
+    },
+    "normal": [
+      {}
+    ]
+  }
+}

@@ -37,6 +37,7 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 public final class BasicSteamBoiler extends BlockMachine {
     public BasicSteamBoiler() {
@@ -68,8 +69,8 @@ public final class BasicSteamBoiler extends BlockMachine {
             ItemStack burnableStack = capability.getStackInSlot(0);
             if(tryHandleAsBurnable(playerIn, hand, playerHeldItem, burnableStack, capability)) return true;
 
-            playerIn.openGui(GearsMod.getInstance(), ModGuis.BASIC_STEAM_BOILER.getGuiId(), worldIn, pos.getX(), pos.getY(), pos.getZ());
         }
+        playerIn.openGui(GearsMod.getInstance(), ModGuis.BASIC_STEAM_BOILER.getGuiId(), worldIn, pos.getX(), pos.getY(), pos.getZ());
         return true;
     }
 
@@ -103,5 +104,15 @@ public final class BasicSteamBoiler extends BlockMachine {
             return true;
         }
         return false;
+    }
+
+    @ParametersAreNonnullByDefault
+    @Override
+    public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
+        TileEntity tileEntity = worldIn.getTileEntity(pos);
+        if(tileEntity instanceof BasicSteamBoilerTileEntity) {
+            ((BasicSteamBoilerTileEntity) tileEntity).dropItems();
+        }
+        super.breakBlock(worldIn, pos, state);
     }
 }

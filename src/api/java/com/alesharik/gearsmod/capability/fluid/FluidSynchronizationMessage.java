@@ -17,8 +17,8 @@
 
 package com.alesharik.gearsmod.capability.fluid;
 
+import com.alesharik.gearsmod.CurrentWorldProvider;
 import com.alesharik.gearsmod.util.ExecutionUtils;
-import com.alesharik.gearsmod.util.Utils;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -35,23 +35,29 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import org.apache.commons.io.Charsets;
+import org.apache.logging.log4j.Level;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+import static com.alesharik.gearsmod.util.ModLoggerHolder.getModLogger;
+import static com.alesharik.gearsmod.util.Utils.getEnumFacingFromIndex;
+import static com.alesharik.gearsmod.util.Utils.readBlockPos;
 
 /**
  * Synchronize water amount in {@link SynchronizedFluidTank} and {@link net.minecraftforge.fluids.capability.IFluidHandler}
  */
 public final class FluidSynchronizationMessage implements IMessage {
     private final BlockPos.MutableBlockPos blockPos;
-    private int world;
+
+    private int worldId;
     private EnumFacing facing;
     private int amount;
     private String fluidName;
 
     public FluidSynchronizationMessage(@Nonnull BlockPos blockPos, @Nonnull World world, int amount, @Nonnull EnumFacing facing, @Nullable Fluid fluid) {
         this.blockPos = new BlockPos.MutableBlockPos(blockPos);
-        this.world = world.provider.getDimension();
+        this.worldId = world.provider.getDimension();
         this.amount = amount;
         this.facing = facing;
         this.fluidName = fluid == null ? null : fluid.getName();
@@ -63,11 +69,11 @@ public final class FluidSynchronizationMessage implements IMessage {
 
     @Override
     public void fromBytes(ByteBuf buf) {
-        blockPos.setPos(buf.readInt(), buf.readInt(), buf.readInt());
-        world = buf.readInt();
-        amount = buf.readInt();
-        facing = Utils.getEnumFacingFromIndex(buf.readByte());
+        readBlockPos(blockPos, buf);
+        worldId = buf.readInt();
+        facing = getEnumFacingFromIndex(buf.readByte());
 
+        amount = buf.readInt();
         int count = buf.readInt();
         if(count == -1)
             fluidName = null;
@@ -83,10 +89,10 @@ public final class FluidSynchronizationMessage implements IMessage {
         buf.writeInt(blockPos.getX());
         buf.writeInt(blockPos.getY());
         buf.writeInt(blockPos.getZ());
-        buf.writeInt(world);
-        buf.writeInt(amount);
+        buf.writeInt(worldId);
         buf.writeByte(facing.getIndex());
 
+        buf.writeInt(amount);
         if(fluidName == null)
             buf.writeInt(-1);
         else {
@@ -120,31 +126,35 @@ public final class FluidSynchronizationMessage implements IMessage {
 
         private void handleMessage(FluidSynchronizationMessage message, MessageContext context) {
             World world;
-            if(context.side == Side.SERVER)
-                world = DimensionManager.getWorld(message.world);
-            else
-                world = Utils.getClientWorldFromClientNetHandler(context.getClientHandler());
+            if(context.side == Side.SERVER) {
+                world = DimensionManager.getWorld(message.worldId);
+                getModLogger().log(Level.INFO, "Detected FluidSynchronizationMessage from client to server!");
+            } else {
+                world = CurrentWorldProvider.getWorld(context, Side.CLIENT);
+            }
 
-            if(message.hasCapability(world)) {
-                IFluidHandler capability = message.getCapability(world);
-                if(capability == null)
-                    return;
+            if(message.hasCapability(world)) handleCapability(message, world);
+        }
 
-                if(capability instanceof SynchronizedFluidTank) {
-                    SynchronizedFluidTank synchronizedFluidTank = (SynchronizedFluidTank) capability;
-                    if(message.fluidName == null)
-                        synchronizedFluidTank.clear();
-                    else
-                        synchronizedFluidTank.setAmount(message.fluidName, message.amount);
-                } else {
-                    for(IFluidTankProperties property : capability.getTankProperties()) {
-                        if(message.fluidName == null && property.getContents() != null)
-                            capability.drain(property.getContents().amount, true);
-                        else if(message.fluidName != null) {
-                            FluidStack fluidStack = property.getContents();
-                            if(fluidStack != null && fluidStack.getFluid().getName().equals(message.fluidName)) {
-                                fluidStack.amount = message.amount;
-                            }
+        private void handleCapability(FluidSynchronizationMessage message, World world) {
+            IFluidHandler capability = message.getCapability(world);
+            if(capability == null)
+                return;
+
+            if(capability instanceof SynchronizedFluidTank) {
+                SynchronizedFluidTank synchronizedFluidTank = (SynchronizedFluidTank) capability;
+                if(message.fluidName == null)
+                    synchronizedFluidTank.clear();
+                else
+                    synchronizedFluidTank.setAmount(message.fluidName, message.amount);
+            } else {
+                for(IFluidTankProperties property : capability.getTankProperties()) {
+                    if(message.fluidName == null && property.getContents() != null)
+                        capability.drain(property.getContents().amount, true);
+                    else if(message.fluidName != null) {
+                        FluidStack fluidStack = property.getContents();
+                        if(fluidStack != null && fluidStack.getFluid().getName().equals(message.fluidName)) {
+                            fluidStack.amount = message.amount;
                         }
                     }
                 }

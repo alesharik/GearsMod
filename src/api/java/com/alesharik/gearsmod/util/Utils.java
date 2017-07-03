@@ -17,15 +17,19 @@
 
 package com.alesharik.gearsmod.util;
 
+import io.netty.buffer.ByteBuf;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
+import java.util.concurrent.ForkJoinPool;
 
 public final class Utils {
     private static final Field clientWorldControllerField;
+    private static final ForkJoinPool FJP = new ForkJoinPool(Runtime.getRuntime().availableProcessors());
 
     static {
         try {
@@ -54,5 +58,19 @@ public final class Utils {
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static void writeBlockPos(BlockPos pos, ByteBuf byteBuf) {
+        byteBuf.writeInt(pos.getX());
+        byteBuf.writeInt(pos.getY());
+        byteBuf.writeInt(pos.getZ());
+    }
+
+    public static void readBlockPos(BlockPos.MutableBlockPos pos, ByteBuf byteBuf) {
+        pos.setPos(byteBuf.readInt(), byteBuf.readInt(), byteBuf.readInt());
+    }
+
+    public static ForkJoinPool getModForkJoinPool() {
+        return FJP;
     }
 }

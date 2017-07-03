@@ -17,11 +17,14 @@
 
 package com.alesharik.gearsmod.proxy;
 
+import com.alesharik.gearsmod.CurrentWorldProvider;
 import com.alesharik.gearsmod.GearsMod;
 import com.alesharik.gearsmod.block.ModBlocks;
 import com.alesharik.gearsmod.capability.fluid.FluidSynchronizationMessage;
+import com.alesharik.gearsmod.capability.fluid.RequestFluidSynchronizationMessage;
 import com.alesharik.gearsmod.capability.smoke.SmokeCapability;
 import com.alesharik.gearsmod.capability.smoke.SmokeChangeMessage;
+import com.alesharik.gearsmod.capability.steam.SteamCapability;
 import com.alesharik.gearsmod.gui.GuiHandler;
 import com.alesharik.gearsmod.integration.IntegrationManager;
 import com.alesharik.gearsmod.integration.theoneprobe.TheOneProbeIntegrationModule;
@@ -32,6 +35,7 @@ import com.alesharik.gearsmod.util.field.SimpleTileEntityFieldStore;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.Item;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.event.RegistryEvent;
@@ -45,7 +49,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class CommonProxy implements ExecutionUtils.Executor {
+public class CommonProxy implements ExecutionUtils.Executor, CurrentWorldProvider.Provider {
     @SidedProxy
     private static CommonProxy proxy;
 
@@ -64,13 +68,15 @@ public class CommonProxy implements ExecutionUtils.Executor {
         ModTileEntities.register();
 
         SmokeCapability.register();
+        SteamCapability.register();
 
         NetworkRegistry.INSTANCE.registerGuiHandler(GearsMod.getInstance(), GuiHandler.getInstance());
 
         SimpleNetworkWrapper networkWrapper = GearsMod.getNetworkWrapper();
         networkWrapper.registerMessage(SimpleTileEntityFieldStore.FieldUpdateMessage.Handler.class, SimpleTileEntityFieldStore.FieldUpdateMessage.class, 0, Side.SERVER);
-        networkWrapper.registerMessage(SmokeChangeMessage.Handler.class, SmokeChangeMessage.class, 0, Side.SERVER);
-        networkWrapper.registerMessage(FluidSynchronizationMessage.Handler.class, FluidSynchronizationMessage.class, 0, Side.SERVER);
+        networkWrapper.registerMessage(SmokeChangeMessage.Handler.class, SmokeChangeMessage.class, 1, Side.SERVER);
+        networkWrapper.registerMessage(FluidSynchronizationMessage.Handler.class, FluidSynchronizationMessage.class, 2, Side.SERVER);
+        networkWrapper.registerMessage(RequestFluidSynchronizationMessage.Handler.class, RequestFluidSynchronizationMessage.class, 3, Side.SERVER);
         IntegrationManager.init();
     }
 
@@ -93,6 +99,14 @@ public class CommonProxy implements ExecutionUtils.Executor {
         }
     }
 
+    @Override
+    public World getWorld(MessageContext context, Side side) {
+        if(side == Side.SERVER && context.getServerHandler().playerEntity.world instanceof WorldServer) {
+            return context.getServerHandler().playerEntity.getServerWorld();
+        }
+        return null;
+    }
+
     public static class ServerProxy extends CommonProxy {
     }
 
@@ -104,8 +118,9 @@ public class CommonProxy implements ExecutionUtils.Executor {
 
             SimpleNetworkWrapper networkWrapper = GearsMod.getNetworkWrapper();
             networkWrapper.registerMessage(SimpleTileEntityFieldStore.FieldUpdateMessage.Handler.class, SimpleTileEntityFieldStore.FieldUpdateMessage.class, 0, Side.CLIENT);
-            networkWrapper.registerMessage(SmokeChangeMessage.Handler.class, SmokeChangeMessage.class, 0, Side.CLIENT);
-            networkWrapper.registerMessage(FluidSynchronizationMessage.Handler.class, FluidSynchronizationMessage.class, 0, Side.CLIENT);
+            networkWrapper.registerMessage(SmokeChangeMessage.Handler.class, SmokeChangeMessage.class, 1, Side.CLIENT);
+            networkWrapper.registerMessage(FluidSynchronizationMessage.Handler.class, FluidSynchronizationMessage.class, 2, Side.CLIENT);
+            networkWrapper.registerMessage(RequestFluidSynchronizationMessage.Handler.class, RequestFluidSynchronizationMessage.class, 3, Side.CLIENT);
 
             ModItems.clientRegister();
             ModTileEntities.clientRegister();
@@ -125,6 +140,16 @@ public class CommonProxy implements ExecutionUtils.Executor {
                 Minecraft.getMinecraft().addScheduledTask(runnable);
             else
                 super.executeTask(context, runnable);
+        }
+
+        @SideOnly(Side.CLIENT)
+        @Override
+        public World getWorld(MessageContext context, Side side) {
+            if(side == Side.CLIENT) {
+                return Minecraft.getMinecraft().world;
+            } else {
+                return super.getWorld(context, side);
+            }
         }
     }
 }

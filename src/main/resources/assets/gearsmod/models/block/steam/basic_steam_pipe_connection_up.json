@@ -1,0 +1,116 @@
+{
+  "parent": "block/cube_all",
+  "elements": [
+    {
+      "from": [
+        4,
+        12,
+        4
+      ],
+      "to": [
+        12,
+        16,
+        12
+      ],
+      "faces": {
+        "north": {
+          "texture": "#all",
+          "cullface": "north",
+          "uv": [
+            4,
+            0,
+            12,
+            4
+          ]
+        },
+        "south": {
+          "texture": "#all",
+          "cullface": "south",
+          "uv": [
+            4,
+            0,
+            12,
+            4
+          ]
+        },
+        "west": {
+          "texture": "#all",
+          "cullface": "west",
+          "uv": [
+            4,
+            0,
+            12,
+            4
+          ]
+        },
+        "east": {
+          "texture": "#all",
+          "cullface": "east",
+          "uv": [
+            4,
+            0,
+            12,
+            4
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        12,
+        16,
+        12
+      ],
+      "to": [
+        4,
+        12,
+        4
+      ],
+      "faces": {
+        "north": {
+          "texture": "#all",
+          "cullface": "north",
+          "uv": [
+            4,
+            0,
+            12,
+            4
+          ]
+        },
+        "south": {
+          "texture": "#all",
+          "cullface": "south",
+          "uv": [
+            4,
+            0,
+            12,
+            4
+          ]
+        },
+        "west": {
+          "texture": "#all",
+          "cullface": "west",
+          "uv": [
+            4,
+            0,
+            12,
+            4
+          ]
+        },
+        "east": {
+          "texture": "#all",
+          "cullface": "east",
+          "uv": [
+            4,
+            0,
+            12,
+            4
+          ]
+        }
+      }
+    }
+  ],
+  "textures": {
+    "all": "gearsmod:blocks/steam/basic_steam_pipe"
+  }
+}

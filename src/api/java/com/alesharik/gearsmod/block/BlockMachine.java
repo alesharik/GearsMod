@@ -40,7 +40,7 @@ import javax.annotation.Nonnull;
  */
 public abstract class BlockMachine extends BlockContainer {
     public static final PropertyDirection FACING = BlockHorizontal.FACING;
-    private static final PropertyBool WORKING_PROPERTY = PropertyBool.create("working");
+    public static final PropertyBool WORKING_PROPERTY = PropertyBool.create("working");
 
     public BlockMachine(Material materialIn) {
         super(materialIn);

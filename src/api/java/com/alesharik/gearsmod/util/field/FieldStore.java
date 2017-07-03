@@ -18,6 +18,8 @@
 package com.alesharik.gearsmod.util.field;
 
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.INBTSerializable;
 
 public interface FieldStore extends INBTSerializable<NBTTagCompound> {
@@ -64,4 +66,8 @@ public interface FieldStore extends INBTSerializable<NBTTagCompound> {
      * Operation must update other connected stores.
      */
     void sync();
+
+    void setWorld(World world);
+
+    void setBlockPos(BlockPos pos);
 }

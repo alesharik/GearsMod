@@ -18,7 +18,7 @@
 package com.alesharik.gearsmod.gui;
 
 import com.alesharik.gearsmod.gui.client.BasicSteamBoilerGui;
-import com.alesharik.gearsmod.gui.server.BasicSteamBoilerContainer;
+import com.alesharik.gearsmod.gui.container.BasicSteamBoilerContainer;
 import com.alesharik.gearsmod.tileEntity.steam.BasicSteamBoilerTileEntity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
@@ -39,13 +39,13 @@ public enum ModGuis implements GuiFactory {
         @Nonnull
         @Override
         public Object getClientGuiElement(@Nonnull EntityPlayer player, @Nonnull World world, @Nonnull BlockPos blockPos) {
-            return new BasicSteamBoilerGui(new BasicSteamBoilerContainer(player.inventory, (BasicSteamBoilerTileEntity) world.getTileEntity(blockPos)));
+            return new BasicSteamBoilerGui(new BasicSteamBoilerContainer(player, (BasicSteamBoilerTileEntity) world.getTileEntity(blockPos)));
         }
 
         @Nonnull
         @Override
         public Object getServerGuiElement(@Nonnull EntityPlayer player, @Nonnull World world, @Nonnull BlockPos blockPos) {
-            return new BasicSteamBoilerContainer(player.inventory, (BasicSteamBoilerTileEntity) world.getTileEntity(blockPos));
+            return new BasicSteamBoilerContainer(player, (BasicSteamBoilerTileEntity) world.getTileEntity(blockPos));
         }
     };
 

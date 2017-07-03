@@ -81,6 +81,7 @@ public class GearsMod {
     public void preInit(FMLPreInitializationEvent event) {
         networkWrapper = new SimpleNetworkWrapper(MODID);
         NetworkWrapperHolder.NETWORK_WRAPPER_ATOMIC_REFERENCE.set(networkWrapper);
+        CurrentWorldProvider.provider.set(CommonProxy.getProxy());
 
         ModLoggerHolder.setModLogger(event.getModLog());
 

@@ -36,6 +36,12 @@ public final class BasicSteamBoilerContainer extends TileEntityContainer<BasicSt
             this.addSlotToContainer(new Slot(player.inventory, x, 57 + x * 17, 102));
         }
 
+        for(int i = 0; i < 3; ++i) {
+            for(int j = 0; j < 9; ++j) {
+                this.addSlotToContainer(new Slot(player.inventory, j + i * 9 + 9, 57 + j * 17, 130 + i * 18));
+            }
+        }
+
         this.addSlotToContainer(new SlotFilteredItemHandler(BurnableFilter.INSTANCE, tileEntity.getCoalItemStackHandler(), 0, 125, 79));
 
         addListener(ContainerSynchronizer.newInstance(player, new int[]{0}));

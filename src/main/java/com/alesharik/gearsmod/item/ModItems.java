@@ -35,6 +35,7 @@ public final class ModItems {
     public static ItemBlock CHIMNEY_BLOCK_ITEM;
     public static ItemBlock SMALL_BRICKS_BLOCK_ITEM;
     public static ItemBlock SIMPLE_SOLAR_PANEL_ITEM;
+    public static ItemBlock BASIC_STEAM_PIPE_ITEM;
 
     private ModItems() {
     }
@@ -69,6 +70,12 @@ public final class ModItems {
         SIMPLE_SOLAR_PANEL_ITEM.setRegistryName("simple_solar_panel");
         SIMPLE_SOLAR_PANEL_ITEM.setCreativeTab(getCreativeTab());
         registry.register(SIMPLE_SOLAR_PANEL_ITEM);
+
+        BASIC_STEAM_PIPE_ITEM = new ItemBlock(ModBlocks.BASIC_STEAM_PIPE);
+        BASIC_STEAM_PIPE_ITEM.setUnlocalizedName("basic_steam_pipe");
+        BASIC_STEAM_PIPE_ITEM.setRegistryName("basic_steam_pipe");
+        BASIC_STEAM_PIPE_ITEM.setCreativeTab(getCreativeTab());
+        registry.register(BASIC_STEAM_PIPE_ITEM);
     }
 
     @SideOnly(Side.CLIENT)
@@ -79,5 +86,7 @@ public final class ModItems {
         modelMesher.register(CHIMNEY_BLOCK_ITEM, 0, new ModelResourceLocation("gearsmod:chimney_block", "inventory"));
         modelMesher.register(SMALL_BRICKS_BLOCK_ITEM, 0, new ModelResourceLocation("gearsmod:small_bricks_block", "inventory"));
         modelMesher.register(SIMPLE_SOLAR_PANEL_ITEM, 0, new ModelResourceLocation("gearsmod:simple_solar_panel", "inventory"));
+
+        modelMesher.register(BASIC_STEAM_PIPE_ITEM, 0, new ModelResourceLocation("gearsmod:basic_steam_pipe", "inventory"));
     }
 }

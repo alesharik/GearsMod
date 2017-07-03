@@ -21,6 +21,7 @@ import com.alesharik.gearsmod.tileEntity.energy.SimpleSolarPanelTileEntity;
 import com.alesharik.gearsmod.tileEntity.smoke.ChimneyTileEntity;
 import com.alesharik.gearsmod.tileEntity.smoke.SmokePipeTileEntity;
 import com.alesharik.gearsmod.tileEntity.steam.BasicSteamBoilerTileEntity;
+import com.alesharik.gearsmod.tileEntity.steam.BasicSteamPipeTileEntity;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -30,6 +31,7 @@ public final class ModTileEntities {
     public static final String SMOKE_PIPE_TILE_ENTITY_ID = "GearsSmokePipeTileEntity";
     public static final String CHIMNEY_TILE_ENTITY = "GearsChimneyTileEntity";
     public static final String SIMPLE_SOLAR_PANEL_TILE_ENTITY = "GearsSimpleSolarPanelTileEntity";
+    public static final String BASIC_STEAM_PIPE_TILE_ENTITY = "GearsBasicSteamPipeTileEntity";
 
     private ModTileEntities() {
     }
@@ -39,6 +41,7 @@ public final class ModTileEntities {
         GameRegistry.registerTileEntity(SmokePipeTileEntity.class, SMOKE_PIPE_TILE_ENTITY_ID);
         GameRegistry.registerTileEntity(ChimneyTileEntity.class, CHIMNEY_TILE_ENTITY);
         GameRegistry.registerTileEntity(SimpleSolarPanelTileEntity.class, SIMPLE_SOLAR_PANEL_TILE_ENTITY);
+        GameRegistry.registerTileEntity(BasicSteamPipeTileEntity.class, BASIC_STEAM_PIPE_TILE_ENTITY);
     }
 
     @SideOnly(Side.CLIENT)
