@@ -29,6 +29,7 @@ import com.alesharik.gearsmod.steam.SteamNetworkHandler;
 import com.alesharik.gearsmod.steam.SteamStorageProvider;
 import com.alesharik.gearsmod.tileEntity.FieldTileEntity;
 import com.alesharik.gearsmod.util.ModLoggerHolder;
+import com.alesharik.gearsmod.util.WorldUtils;
 import com.alesharik.gearsmod.util.field.SimpleTileEntityFieldStore;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
@@ -37,6 +38,7 @@ import net.minecraft.nbt.NBTTagInt;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ITickable;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.FluidRegistry;
@@ -51,10 +53,14 @@ import org.apache.logging.log4j.Level;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.security.SecureRandom;
+import java.util.Random;
 
 import static com.alesharik.gearsmod.util.PhysicMath.*;
 
 public final class BasicSteamBoilerTileEntity extends FieldTileEntity implements ITickable, SteamStorageProvider {
+    private static final Random RANDOM = new SecureRandom();
+
     private final SmokeHandler smokeHandler;
     private final SynchronizedFluidTank fluidHandler;
     private final ItemStackHandler coalItemStackHandler;
@@ -86,9 +92,11 @@ public final class BasicSteamBoilerTileEntity extends FieldTileEntity implements
 
         fluidHandler.setTileEntity(this);
         fluidHandler.setFacing(world.getBlockState(pos).getValue(BlockMachine.FACING).rotateY());
-        fluidHandler.sync(Side.CLIENT);
+        fluidHandler.sync(Side.SERVER);
 
         steamHandler = SteamNetworkHandler.getStorageForBlock(world, pos, 1000, 10000, aDouble -> ModLoggerHolder.getModLogger().log(Level.ERROR, "Ok"));
+        steamHandler.getNetwork().initBlock(pos);
+
         markDirty();
     }
 
@@ -101,13 +109,13 @@ public final class BasicSteamBoilerTileEntity extends FieldTileEntity implements
             return true;
         else if(facing == null && capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
             return true;
-        return false;
+        return super.hasCapability(capability, facing);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
-        if((facing == null || facing == EnumFacing.SOUTH) && capability == SmokeCapability.DEFAULT_CAPABILITY)
+        if((facing == null || facing == world.getBlockState(pos).getValue(BlockMachine.FACING).getOpposite()) && capability == SmokeCapability.DEFAULT_CAPABILITY)
             return (T) smokeHandler;
         else if((facing == world.getBlockState(pos).getValue(BlockMachine.FACING).rotateY() || facing == world.getBlockState(pos).getValue(BlockMachine.FACING).rotateYCCW() || facing == null)
                 && capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)
@@ -115,7 +123,7 @@ public final class BasicSteamBoilerTileEntity extends FieldTileEntity implements
         else if(facing == null && capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
             return (T) coalItemStackHandler;
         else
-            return null;
+            return super.getCapability(capability, facing);
     }
 
     @Nonnull
@@ -196,34 +204,68 @@ public final class BasicSteamBoilerTileEntity extends FieldTileEntity implements
     @Override
     public void update() {
         if(!world.isRemote) {
+            if(smokeHandler.overloaded())
+                smokeHandler.extract((int) (2 + Math.round((smokeHandler.getSmokeAmount() * 1.0F / smokeHandler.getMaxSmokeAmount()) * 1.5)), false);
+
             if(!isWorking()) {
+                FluidStack drain = fluidHandler.drain(1, false);
+                if(fluidHandler.getFluid() == null || (drain != null && drain.amount <= 0)) {
+                    return;
+                }
+
                 double count = burnableItemToMegaJoules(coalItemStackHandler.getStackInSlot(0));
+
                 if(count > 0) {
                     lastMJ += count;
                     setWorking(true);
+                    ItemStack itemStack = coalItemStackHandler.getStackInSlot(0);
+                    itemStack.setCount(itemStack.getCount() - 1);
                 } else {
                     temperature -= 1F / 20;
                 }
             } else {
-                temperature += 1F / 20;
                 FluidStack drain = fluidHandler.drain(1, false);
                 if(fluidHandler.getFluid() == null || (drain != null && drain.amount <= 0)) {
                     setWorking(false);
                     return;
                 }
-                fluidHandler.drain(1, true);
 
-                double mjRequired = MEGA_JOULES_PER_MILLI_BUCKET;
+                double mjRequired = getMegaJoulesWithEfficiency(MEGA_JOULES_PER_MILLI_BUCKET, smokeHandler.getSmokeAmount(), smokeHandler.getMaxSmokeAmount());
+                if(mjRequired == 0) {
+                    lastMJ -= 0.01;
+                    smokeHandler.receiveInternal(10);
+                    return;
+                }
+
                 if(lastMJ < mjRequired) {
                     setWorking(false);
                     return;
                 }
+
+                fluidHandler.drain(1, true);
+
+                temperature += 1F / 20;
                 lastMJ -= mjRequired;
-                steamHandler.getNetwork().addSteam(getSteamPressureForTemperature(celsiusToKelvin(temperature)), temperature);
+//                steamHandler.getNetwork().addSteam(getSteamPressureForTemperature(celsiusToKelvin(temperature)), temperature);
+                steamHandler.getNetwork().addSteam(1, temperature);
+
+                smokeHandler.receiveInternal(10);
             }
             if(temperature < 100)
                 temperature = 100;
             markDirty();
+        } else {
+            if(smokeHandler.overloaded()) {
+                if(RANDOM.nextInt(3) == 0)
+                    return;
+
+                for(int i = 0; i < 5 + (smokeHandler.getSmokeAmount() * 1.0F / smokeHandler.getMaxSmokeAmount()) * 4; i++) {
+                    double d3 = (double) pos.getX() + RANDOM.nextInt(10) / 10F + RANDOM.nextDouble() * 0.60000000149011612D;
+                    double d8 = (double) pos.getY() + 0.95 + RANDOM.nextDouble();
+                    double d13 = (double) pos.getZ() + RANDOM.nextInt(10) / 10F + RANDOM.nextDouble() * 0.60000000149011612D;
+                    world.spawnParticle(EnumParticleTypes.SMOKE_LARGE, d3, d8, d13, 0.0D, 0.0D, 0.0D);
+                }
+            }
         }
     }
 
@@ -232,8 +274,7 @@ public final class BasicSteamBoilerTileEntity extends FieldTileEntity implements
     }
 
     private void setWorking(boolean b) {
-        world.setBlockState(pos, world.getBlockState(pos)
-                .withProperty(BlockMachine.WORKING_PROPERTY, b));
+        WorldUtils.changeBlockState(world, pos, state -> state.withProperty(BlockMachine.WORKING_PROPERTY, b));
     }
 
     @Nonnull
@@ -246,5 +287,9 @@ public final class BasicSteamBoilerTileEntity extends FieldTileEntity implements
     @Override
     public EnumFacing[] getConnectedFacing() {
         return new EnumFacing[]{EnumFacing.UP};
+    }
+
+    public void onRemove() {
+        steamHandler.getNetwork().destroyBlock(pos);
     }
 }

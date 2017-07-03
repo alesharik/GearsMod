@@ -84,6 +84,15 @@ public class SmokeHandler implements SmokeStorage, INBTSerializable<NBTTagInt> {
         smokeAmount += amount;
     }
 
+    /**
+     * DO NOT USE IT IF YOU AREN'T OWNER TILEENTITY
+     */
+    public void receiveInternal(int amount) {
+        if(listener != null)
+            listener.receive(amount);
+        smokeAmount += amount;
+    }
+
     @Override
     public NBTTagInt serializeNBT() {
         return new NBTTagInt(smokeAmount);

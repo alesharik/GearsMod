@@ -30,7 +30,7 @@ public interface SmokeStorage {
      * Return true if smoke amount is greater than max smoke amount
      */
     default boolean overloaded() {
-        return getMaxSmokeAmount() < getSmokeAmount();
+        return getMaxSmokeAmount() <= getSmokeAmount();
     }
 
     /**

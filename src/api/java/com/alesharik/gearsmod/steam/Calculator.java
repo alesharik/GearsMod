@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -39,7 +40,7 @@ final class Calculator {
         throw new UnsupportedOperationException();
     }
 
-    static void recalculateVolume(World world, List<BlockPos> poses, AtomicDouble store) {
+    static void recalculateVolume(World world, Set<BlockPos> poses, AtomicDouble store) {
         double value = 0;
         for(BlockPos pos : poses) {
             TileEntity tileEntity = world.getTileEntity(pos);
@@ -68,7 +69,7 @@ final class Calculator {
      * @param world
      * @param poses
      */
-    static void checkForce(double pressure, double volume, World world, List<BlockPos> poses) {
+    static void checkForce(double pressure, double volume, World world, Set<BlockPos> poses) {
         double force = PhysicMath.getForceByPressureAndVolume(pressure, volume);
         HandleForceTask task = new HandleForceTask(force);
 
@@ -100,7 +101,7 @@ final class Calculator {
      * @param world
      * @param poses
      */
-    static void recalculatePressure(double volume, double temperature, AtomicDouble pressure, World world, List<BlockPos> poses) {
+    static void recalculatePressure(double volume, double temperature, AtomicDouble pressure, World world, Set<BlockPos> poses) {
         double newValue = PhysicMath.getSteamPressureForTemperature(temperature) / volume;
         double last = pressure.getAndSet(newValue);
         if(!compare(newValue, last, 0.0001)) {
@@ -130,7 +131,7 @@ final class Calculator {
 
             map.put(next, facing);
         }
-        Utils.getModForkJoinPool().execute(new CheckCorrectnessTask(map, poses));
+        Utils.getModForkJoinPool().execute(new CheckCorrectnessTask(map, poses, world));
     }
 
     private static boolean compare(double a, double b, double eps) {
@@ -182,10 +183,12 @@ final class Calculator {
     private static final class CheckCorrectnessTask implements Runnable {
         private final Map<BlockPos, EnumFacing[]> poses;
         private final List<BlockPos> baseList;
+        private final World world;
 
-        public CheckCorrectnessTask(Map<BlockPos, EnumFacing[]> poses, List<BlockPos> list) {
+        public CheckCorrectnessTask(Map<BlockPos, EnumFacing[]> poses, List<BlockPos> list, World world) {
             this.poses = poses;
             this.baseList = list;
+            this.world = world;
         }
 
         @Override
@@ -263,10 +266,23 @@ final class Calculator {
     }
 
     private static final class UpdateNetworksTask implements Runnable {
+        private final World world;
+        private final List<BlockPos> poses;
+
+        public UpdateNetworksTask(World world, List<BlockPos> poses) {
+            this.world = world;
+            this.poses = poses;
+        }
 
         @Override
         public void run() {
-
+//            List<TileEntity> tileEntities = poses.stream()
+//                    .map(world::getTileEntity)
+//                    .filter(Objects::nonNull)
+//                    .map(tileEntity -> {
+//                        if(tileEntity instanceof SteamStorageProvider)
+//                            ((SteamStorageProvider) tileEntity).getSteamStorage();
+//                    });
         }
     }
 }

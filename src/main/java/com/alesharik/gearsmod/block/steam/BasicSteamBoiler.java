@@ -69,8 +69,8 @@ public final class BasicSteamBoiler extends BlockMachine {
             ItemStack burnableStack = capability.getStackInSlot(0);
             if(tryHandleAsBurnable(playerIn, hand, playerHeldItem, burnableStack, capability)) return true;
 
+            playerIn.openGui(GearsMod.getInstance(), ModGuis.BASIC_STEAM_BOILER.getGuiId(), worldIn, pos.getX(), pos.getY(), pos.getZ());
         }
-        playerIn.openGui(GearsMod.getInstance(), ModGuis.BASIC_STEAM_BOILER.getGuiId(), worldIn, pos.getX(), pos.getY(), pos.getZ());
         return true;
     }
 
@@ -97,7 +97,7 @@ public final class BasicSteamBoiler extends BlockMachine {
     }
 
     private boolean tryHandleAsBucket(EntityPlayer playerIn, BasicSteamBoilerTileEntity tileEntity, ItemStack playerHeldItem, FluidStack waterTankContents) {
-        if(playerHeldItem.getItem() == Items.WATER_BUCKET && waterTankContents != null && tileEntity.getWaterProperty().getCapacity() - waterTankContents.amount >= 1000) {
+        if(playerHeldItem.getItem() == Items.WATER_BUCKET && (waterTankContents == null || tileEntity.getWaterProperty().getCapacity() - waterTankContents.amount >= 1000)) {
             playerHeldItem.setCount(playerHeldItem.getCount() - 1);//Remove 1 water bucket
             playerIn.inventory.addItemStackToInventory(new ItemStack(Items.BUCKET));//Add 1 empty bucket
             tileEntity.addLiquid(1000);//Add 1b water
@@ -112,7 +112,15 @@ public final class BasicSteamBoiler extends BlockMachine {
         TileEntity tileEntity = worldIn.getTileEntity(pos);
         if(tileEntity instanceof BasicSteamBoilerTileEntity) {
             ((BasicSteamBoilerTileEntity) tileEntity).dropItems();
+            ((BasicSteamBoilerTileEntity) tileEntity).onRemove();
         }
         super.breakBlock(worldIn, pos, state);
+    }
+
+    @Override
+    public int getLightValue(IBlockState state) {
+        if(state.getValue(WORKING_PROPERTY))
+            return 8;
+        return 0;
     }
 }

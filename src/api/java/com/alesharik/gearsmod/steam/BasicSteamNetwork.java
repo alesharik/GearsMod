@@ -17,6 +17,7 @@
 
 package com.alesharik.gearsmod.steam;
 
+import com.alesharik.gearsmod.util.PhysicMath;
 import com.google.common.util.concurrent.AtomicDouble;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -29,8 +30,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.INBTSerializable;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.stream.IntStream;
 
 import static com.alesharik.gearsmod.steam.Calculator.*;
@@ -49,30 +50,55 @@ public class BasicSteamNetwork implements SteamNetwork, INBTSerializable<NBTTagC
      */
     final AtomicDouble volume;
 
-    private final List<BlockPos> poses;
+    private final Set<BlockPos> poses;
     private final World world;
 
     BasicSteamNetwork(World world) {
         pressure = new AtomicDouble();
         temperature = new AtomicDouble();
-        poses = new ArrayList<>();
+        poses = new CopyOnWriteArraySet<>();
         this.world = world;
         this.volume = new AtomicDouble();
     }
 
     @Override
     public void addSteam(double volume, double temperature) {
-
+        this.temperature.set(this.temperature.get() + PhysicMath.celsiusToKelvin(temperature) / 2F);
+        this.pressure.addAndGet(PhysicMath.getSteamPressureForTemperature(this.temperature.get()) * volume);
+        recalculatePressure(this.volume.get(), this.temperature.get(), pressure, world, poses);
     }
 
     @Override
     public boolean removeSteam(double volume) {
-        return false;
+        double pressureToRemove = PhysicMath.getSteamPressureForTemperature(this.temperature.get());
+
+        double pr = this.pressure.get();
+        double val = pr - pressureToRemove;
+        if(val < 0)
+            return false;
+        while(!pressure.compareAndSet(pr, val)) {
+            pr = pressure.get();
+            val = pr - pressureToRemove;
+            if(val < 0)
+                return false;
+        }
+        recalculatePressure(this.volume.get(), this.temperature.get(), pressure, world, poses);
+        return true;
+    }
+
+    @Override
+    public void syncTemperature(double t) {
+        this.pressure.set(this.pressure.get() + PhysicMath.celsiusToKelvin(t) / 2F);
     }
 
     @Override
     public double getTemperature() {
         return temperature.get();
+    }
+
+    @Override
+    public double getPressure() {
+        return pressure.get();
     }
 
     @Override

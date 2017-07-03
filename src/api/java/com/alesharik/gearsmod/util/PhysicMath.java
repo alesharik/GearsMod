@@ -82,4 +82,11 @@ public final class PhysicMath {
     public static double getForceByPressureAndVolume(double pressure, double volume) {
         return pressure / volume;
     }
+
+    public static double getMegaJoulesWithEfficiency(double base, double count, double max) {
+        double v = base / max * (max - count);
+        if(v < 0)
+            return 0;
+        return v;
+    }
 }

@@ -32,10 +32,11 @@ final class SteamStorageImpl implements SteamStorage {
 
     private volatile SteamNetwork network;
 
-    public SteamStorageImpl(double maxForce, double volume, Consumer<Double> onOverload) {
+    public SteamStorageImpl(double maxForce, double volume, Consumer<Double> onOverload, SteamNetwork network) {
         this.maxForce = maxForce;
         this.volume = volume;
         this.onOverload = onOverload;
+        this.network = network;
     }
 
     @Nonnull

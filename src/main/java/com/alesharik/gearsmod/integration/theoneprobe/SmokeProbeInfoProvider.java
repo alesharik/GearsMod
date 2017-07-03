@@ -35,7 +35,7 @@ import java.awt.Color;
 
 public class SmokeProbeInfoProvider implements IProbeInfoProvider {
     private static final int progressBarDefaultColor = new Color(51, 51, 51).getRGB();
-    private static final int progressBarOverloadedColor = new Color(122, 13, 0).getRGB();
+    private static final int progressBarOverloadedColor = new Color(140, 14, 0).getRGB();
 
     @Override
     public String getID() {
@@ -52,10 +52,13 @@ public class SmokeProbeInfoProvider implements IProbeInfoProvider {
 
             IProgressStyle progressStyle = new ProgressStyle()
                     .prefix("Smoke: ");
-            if(smokeStorage.overloaded())
+            if(smokeStorage.overloaded()) {
                 progressStyle.filledColor(progressBarOverloadedColor);
-            else
+                progressStyle.alternateFilledColor(progressBarOverloadedColor);
+            } else {
                 progressStyle.filledColor(progressBarDefaultColor);
+                progressStyle.alternateFilledColor(progressBarDefaultColor);
+            }
 
             probeInfo.progress(smokeStorage.getSmokeAmount(), smokeStorage.getMaxSmokeAmount(), progressStyle);
 

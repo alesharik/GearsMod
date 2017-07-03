@@ -59,6 +59,7 @@ public class TheOneProbeIntegrationModule implements IntegrationModule, Function
             return null;
 
         input.registerProvider(new SmokeProbeInfoProvider());
+        input.registerProvider(new SteamProbeInfoProvider());
 
         return null;
     }

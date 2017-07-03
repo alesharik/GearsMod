@@ -15,42 +15,28 @@
  *     along with GearsMod.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.alesharik.gearsmod.steam;
+package com.alesharik.gearsmod.util;
 
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
-public interface SteamNetwork {
-    /**
-     * @param volume      in m3
-     * @param temperature in Celsius
-     */
-    void addSteam(double volume, double temperature);
+import java.util.function.Function;
 
-    boolean removeSteam(double volume);
+public final class WorldUtils {
+    private WorldUtils() {
+        throw new UnsupportedOperationException();
+    }
 
-    /**
-     * @param t temperature in Celsius
-     */
-    void syncTemperature(double t);
+    public static void changeBlockState(World world, BlockPos pos, Function<IBlockState, IBlockState> replacer) {
+        TileEntity tileEntity = world.getTileEntity(pos);
 
-    /**
-     * @return steam temperature in Celsius
-     */
-    double getTemperature();
+        world.setBlockState(pos, replacer.apply(world.getBlockState(pos)));
 
-    double getPressure();
-
-    /**
-     * Call this after tileEntity loaded
-     *
-     * @param pos tileEntity position
-     */
-    void initBlock(BlockPos pos);
-
-    /**
-     * Call this before tileEntity delete
-     *
-     * @param pos tileEntity position
-     */
-    void destroyBlock(BlockPos pos);
+        if(tileEntity != null) {
+            tileEntity.validate();
+            world.setTileEntity(pos, tileEntity);
+        }
+    }
 }
