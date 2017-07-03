@@ -66,7 +66,7 @@ public final class BasicSteamPipeTileEntity extends TileEntity implements SteamS
 
     @Override
     public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing) {
-        return capability == SteamCapability.CAPABILITY;
+        return capability == SteamCapability.CAPABILITY || super.hasCapability(capability, facing);
     }
 
     @SuppressWarnings("unchecked")
@@ -75,6 +75,6 @@ public final class BasicSteamPipeTileEntity extends TileEntity implements SteamS
     public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
         if(capability == SteamCapability.CAPABILITY)
             return (T) steamStorage;
-        return null;
+        return super.getCapability(capability, facing);
     }
 }

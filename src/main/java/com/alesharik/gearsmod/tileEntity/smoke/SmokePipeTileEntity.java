@@ -21,12 +21,13 @@ import com.alesharik.gearsmod.capability.smoke.SmokeCapability;
 import com.alesharik.gearsmod.capability.smoke.SmokeHandler;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ITickable;
 import net.minecraftforge.common.capabilities.Capability;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public final class SmokePipeTileEntity extends TileEntity {
+public final class SmokePipeTileEntity extends TileEntity implements ITickable {
     private final SmokeHandler smokeHandler;
 
     public SmokePipeTileEntity() {
@@ -35,13 +36,18 @@ public final class SmokePipeTileEntity extends TileEntity {
 
     @Override
     public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing) {
-        return capability == SmokeCapability.DEFAULT_CAPABILITY;
+        return capability == SmokeCapability.DEFAULT_CAPABILITY || super.hasCapability(capability, facing);
     }
 
     @SuppressWarnings("unchecked")
     @Nullable
     @Override
     public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
-        return (capability == SmokeCapability.DEFAULT_CAPABILITY) ? (T) smokeHandler : null;
+        return (capability == SmokeCapability.DEFAULT_CAPABILITY) ? (T) smokeHandler : super.getCapability(capability, facing);
+    }
+
+    @Override
+    public void update() {
+
     }
 }

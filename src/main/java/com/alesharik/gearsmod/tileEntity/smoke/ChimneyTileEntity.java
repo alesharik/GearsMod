@@ -40,7 +40,7 @@ public final class ChimneyTileEntity extends TileEntity implements ITickable {
 
     @Override
     public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing) {
-        return facing == EnumFacing.NORTH && capability == SmokeCapability.DEFAULT_CAPABILITY;
+        return (facing == EnumFacing.NORTH && capability == SmokeCapability.DEFAULT_CAPABILITY) || super.hasCapability(capability, facing);
     }
 
     @SuppressWarnings("unchecked")
@@ -49,6 +49,6 @@ public final class ChimneyTileEntity extends TileEntity implements ITickable {
     public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
         if(facing == EnumFacing.NORTH && capability == SmokeCapability.DEFAULT_CAPABILITY)
             return (T) smokeHandler;
-        return null;
+        return super.getCapability(capability, facing);
     }
 }

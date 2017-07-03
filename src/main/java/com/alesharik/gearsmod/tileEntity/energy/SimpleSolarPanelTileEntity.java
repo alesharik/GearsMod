@@ -46,14 +46,14 @@ public final class SimpleSolarPanelTileEntity extends TileEntity implements ITic
 
     @Override
     public boolean hasCapability(@Nullable Capability<?> capability, @Nullable EnumFacing facing) {
-        return (facing == EnumFacing.DOWN || facing == null) && capability == CapabilityEnergy.ENERGY;
+        return ((facing == EnumFacing.DOWN || facing == null) && capability == CapabilityEnergy.ENERGY) || super.hasCapability(capability, facing);
     }
 
     @SuppressWarnings("unchecked")
     @Nullable
     @Override
     public <T> T getCapability(@Nullable Capability<T> capability, @Nullable EnumFacing facing) {
-        return (facing == EnumFacing.DOWN || facing == null) && capability == CapabilityEnergy.ENERGY ? (T) energyStorage : null;
+        return (facing == EnumFacing.DOWN || facing == null) && capability == CapabilityEnergy.ENERGY ? (T) energyStorage : super.getCapability(capability, facing);
     }
 
     @Override
