@@ -19,6 +19,8 @@ package com.alesharik.gearsmod.tileEntity.smoke;
 
 import com.alesharik.gearsmod.capability.smoke.SmokeCapability;
 import com.alesharik.gearsmod.capability.smoke.SmokeHandler;
+import com.alesharik.gearsmod.capability.smoke.SmokeHandlerSynchronizer;
+import com.alesharik.gearsmod.capability.smoke.SmokeStorage;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
@@ -28,6 +30,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public final class SmokePipeTileEntity extends TileEntity implements ITickable {
+    private static final EnumFacing[] SIDES = new EnumFacing[]{EnumFacing.NORTH, EnumFacing.WEST, EnumFacing.EAST, EnumFacing.SOUTH};
+
     private final SmokeHandler smokeHandler;
 
     public SmokePipeTileEntity() {
@@ -48,6 +52,55 @@ public final class SmokePipeTileEntity extends TileEntity implements ITickable {
 
     @Override
     public void update() {
+        if(!world.isRemote) {
+            boolean topInsert = false;
+            //Sync with sides
+            for(EnumFacing side : SIDES) {
+                TileEntity tileEntity = world.getTileEntity(pos.offset(side));
+                if(tileEntity != null && tileEntity.hasCapability(SmokeCapability.DEFAULT_CAPABILITY, side.getOpposite())) {
+                    SmokeStorage smokeStorage = tileEntity.getCapability(SmokeCapability.DEFAULT_CAPABILITY, side.getOpposite());
+                    if(smokeStorage != null) {
+                        if(smokeStorage.canReceive() && smokeHandler.getSmokeAmount() > smokeStorage.getSmokeAmount() && !smokeStorage.overloaded()) {
+                            int delete = smokeHandler.extract(10, false);
+                            smokeStorage.receive(delete);
+                        } else if(smokeStorage.canExtract() && smokeHandler.getSmokeAmount() < smokeStorage.getSmokeAmount() && !smokeHandler.overloaded()) {
+                            int delete = smokeStorage.extract(10, false);
+                            smokeHandler.receive(delete);
+                        } else if(smokeHandler.overloaded()) {
+                            int delete = smokeHandler.extract(10, false);
+                            smokeStorage.receive(delete);
+                        }
+                        SmokeHandlerSynchronizer.synchronize(world, pos.offset(side), side.getOpposite());
+                    }
+                }
+            }
 
+            //Try insert into top tileEntity
+            TileEntity topTileEntity = world.getTileEntity(pos.offset(EnumFacing.UP));
+            if(topTileEntity != null && topTileEntity.hasCapability(SmokeCapability.DEFAULT_CAPABILITY, EnumFacing.DOWN)) {
+                SmokeStorage smokeStorage = topTileEntity.getCapability(SmokeCapability.DEFAULT_CAPABILITY, EnumFacing.DOWN);
+                if(smokeStorage != null && smokeStorage.canReceive() &&
+                        (!smokeStorage.overloaded() || (smokeStorage.overloaded() && smokeHandler.overloaded()))
+                        && smokeHandler.getSmokeAmount() > smokeStorage.getSmokeAmount()) {
+                    int delete = smokeHandler.extract(100, false);
+                    smokeStorage.receive(delete);
+                    SmokeHandlerSynchronizer.synchronize(world, pos.offset(EnumFacing.UP), EnumFacing.DOWN);
+                    topInsert = true;
+                }
+            }
+            //If can't insert into top, insert into bottom
+            if(!topInsert) {
+                TileEntity bottomTileEntity = world.getTileEntity(pos.offset(EnumFacing.DOWN));
+                if(bottomTileEntity != null && bottomTileEntity.hasCapability(SmokeCapability.DEFAULT_CAPABILITY, EnumFacing.UP)) {
+                    SmokeStorage smokeStorage = bottomTileEntity.getCapability(SmokeCapability.DEFAULT_CAPABILITY, EnumFacing.UP);
+                    if(smokeStorage != null && smokeStorage.canReceive() && (!smokeStorage.overloaded() || (smokeStorage.overloaded() && smokeHandler.overloaded()))
+                            && smokeHandler.getSmokeAmount() > smokeStorage.getSmokeAmount()) {
+                        int delete = smokeHandler.extract(20, false);
+                        smokeStorage.receive(delete);
+                        SmokeHandlerSynchronizer.synchronize(world, pos.offset(EnumFacing.DOWN), EnumFacing.UP);
+                    }
+                }
+            }
+        }
     }
 }

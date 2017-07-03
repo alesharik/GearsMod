@@ -51,8 +51,8 @@ public final class SteamNetworkHandler {
             networks.put(id, network);
         }
 
-        SteamStorageImpl storage = new SteamStorageImpl(volume, maxForce, onOverload);
         BasicSteamNetwork network1 = network.getNetwork(world, pos);
+        SteamStorageImpl storage = new SteamStorageImpl(volume, maxForce, onOverload, network1);
         network1.bakeSteamStorage(storage);
         return storage;
     }

@@ -93,7 +93,8 @@ public final class SmokeChangeMessage implements IMessage {
             if(capability instanceof SmokeHandler) {
                 SmokeHandler capability1 = (SmokeHandler) capability;
                 capability1.smokeAmount = message.amount;
-                capability1.listener.update(message.amount);
+                if(capability1.listener != null)
+                    capability1.listener.update(message.amount);
             } else
                 throw new IllegalArgumentException("SmokeCapability must extends from SmokeHandler!");
         }
