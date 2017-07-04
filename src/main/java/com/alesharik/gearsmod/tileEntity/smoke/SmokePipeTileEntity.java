@@ -21,10 +21,16 @@ import com.alesharik.gearsmod.capability.smoke.SmokeCapability;
 import com.alesharik.gearsmod.capability.smoke.SmokeHandler;
 import com.alesharik.gearsmod.capability.smoke.SmokeHandlerSynchronizer;
 import com.alesharik.gearsmod.capability.smoke.SmokeStorage;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagInt;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -60,10 +66,12 @@ public final class SmokePipeTileEntity extends TileEntity implements ITickable {
                 if(tileEntity != null && tileEntity.hasCapability(SmokeCapability.DEFAULT_CAPABILITY, side.getOpposite())) {
                     SmokeStorage smokeStorage = tileEntity.getCapability(SmokeCapability.DEFAULT_CAPABILITY, side.getOpposite());
                     if(smokeStorage != null) {
-                        if(smokeStorage.canReceive() && smokeHandler.getSmokeAmount() > smokeStorage.getSmokeAmount() && !smokeStorage.overloaded()) {
+                        if(smokeStorage.canReceive() && smokeHandler.getSmokeAmount() > smokeStorage.getSmokeAmount() && !smokeStorage.overloaded()
+                                && smokeStorage.getSmokeAmount() + 20 < smokeStorage.getMaxSmokeAmount()) {
                             int delete = smokeHandler.extract(10, false);
                             smokeStorage.receive(delete);
-                        } else if(smokeStorage.canExtract() && smokeHandler.getSmokeAmount() < smokeStorage.getSmokeAmount() && !smokeHandler.overloaded()) {
+                        } else if(smokeStorage.canExtract() && smokeHandler.getSmokeAmount() < smokeStorage.getSmokeAmount() && !smokeHandler.overloaded()
+                                && smokeHandler.getSmokeAmount() + 20 < smokeHandler.getMaxSmokeAmount()) {
                             int delete = smokeStorage.extract(10, false);
                             smokeHandler.receive(delete);
                         } else if(smokeHandler.overloaded()) {
@@ -101,6 +109,32 @@ public final class SmokePipeTileEntity extends TileEntity implements ITickable {
                     }
                 }
             }
+            markDirty();
         }
+    }
+
+    @Override
+    public void readFromNBT(NBTTagCompound compound) {
+        super.readFromNBT(compound);
+        smokeHandler.deserializeNBT((NBTTagInt) compound.getTag("smoke"));
+    }
+
+    @Nonnull
+    @Override
+    public NBTTagCompound writeToNBT(NBTTagCompound c) {
+        NBTTagCompound compound = super.writeToNBT(c);
+        compound.setTag("smoke", smokeHandler.serializeNBT());
+        return compound;
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
+        readFromNBT(pkt.getNbtCompound());
+    }
+
+    @Override
+    public SPacketUpdateTileEntity getUpdatePacket() {
+        return new SPacketUpdateTileEntity(pos, 1, serializeNBT());
     }
 }

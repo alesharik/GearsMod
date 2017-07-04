@@ -45,6 +45,7 @@ import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -88,7 +89,8 @@ public final class BasicSteamBoilerTileEntity extends FieldTileEntity implements
         store.sync();
 
         smokeHandler.setListener(new SmokeHandlerUpdateListener(pos, world, world.getBlockState(pos).getValue(BlockMachine.FACING).getOpposite()));
-        SmokeHandlerSynchronizer.synchronize(world, pos, world.getBlockState(pos).getValue(BlockMachine.FACING).getOpposite());
+        if(FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER)
+            SmokeHandlerSynchronizer.synchronize(world, pos, world.getBlockState(pos).getValue(BlockMachine.FACING).getOpposite());
 
         fluidHandler.setTileEntity(this);
         fluidHandler.setFacing(world.getBlockState(pos).getValue(BlockMachine.FACING).rotateY());
@@ -96,8 +98,6 @@ public final class BasicSteamBoilerTileEntity extends FieldTileEntity implements
 
         steamHandler = SteamNetworkHandler.getStorageForBlock(world, pos, 1000, 10000, aDouble -> ModLoggerHolder.getModLogger().log(Level.ERROR, "Ok"));
         steamHandler.getNetwork().initBlock(pos);
-
-        markDirty();
     }
 
     @Override
@@ -246,7 +246,6 @@ public final class BasicSteamBoilerTileEntity extends FieldTileEntity implements
 
                 temperature += 1F / 20;
                 lastMJ -= mjRequired;
-//                steamHandler.getNetwork().addSteam(getSteamPressureForTemperature(celsiusToKelvin(temperature)), temperature);
                 steamHandler.getNetwork().addSteam(1, temperature);
 
                 smokeHandler.receiveInternal(10);

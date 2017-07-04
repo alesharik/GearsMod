@@ -33,6 +33,9 @@ public final class WorldUtils {
         TileEntity tileEntity = world.getTileEntity(pos);
 
         world.setBlockState(pos, replacer.apply(world.getBlockState(pos)));
+        TileEntity newTileEntity = world.getTileEntity(pos);
+        if(newTileEntity != null)
+            newTileEntity.invalidate();
 
         if(tileEntity != null) {
             tileEntity.validate();
