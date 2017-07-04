@@ -21,6 +21,7 @@ import com.alesharik.gearsmod.capability.smoke.SmokeCapability;
 import com.alesharik.gearsmod.capability.smoke.SmokeHandler;
 import com.alesharik.gearsmod.capability.smoke.SmokeHandlerSynchronizer;
 import com.alesharik.gearsmod.capability.smoke.SmokeStorage;
+import com.alesharik.gearsmod.util.ModLoggerHolder;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagInt;
 import net.minecraft.network.NetworkManager;
@@ -31,6 +32,7 @@ import net.minecraft.util.ITickable;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.apache.logging.log4j.Level;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -116,7 +118,11 @@ public final class SmokePipeTileEntity extends TileEntity implements ITickable {
     @Override
     public void readFromNBT(NBTTagCompound compound) {
         super.readFromNBT(compound);
-        smokeHandler.deserializeNBT((NBTTagInt) compound.getTag("smoke"));
+        try {
+            smokeHandler.deserializeNBT((NBTTagInt) compound.getTag("smoke"));
+        } catch (NullPointerException e) {
+            ModLoggerHolder.getModLogger().log(Level.ERROR, "Forge is bad!");
+        }
     }
 
     @Nonnull
@@ -124,6 +130,19 @@ public final class SmokePipeTileEntity extends TileEntity implements ITickable {
     public NBTTagCompound writeToNBT(NBTTagCompound c) {
         NBTTagCompound compound = super.writeToNBT(c);
         compound.setTag("smoke", smokeHandler.serializeNBT());
+        return compound;
+    }
+
+    @Override
+    public void deserializeNBT(NBTTagCompound nbt) {
+        readFromNBT(nbt);
+    }
+
+    @Nonnull
+    @Override
+    public NBTTagCompound serializeNBT() {
+        NBTTagCompound compound = new NBTTagCompound();
+        writeToNBT(compound);
         return compound;
     }
 

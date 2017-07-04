@@ -26,7 +26,6 @@ import javax.annotation.Nonnull;
  * All steam tileEntities must implements this interface or return SteamCapability on side == null
  */
 public interface SteamStorageProvider {
-    @Nonnull
     SteamStorage getSteamStorage();
 
     @Nonnull

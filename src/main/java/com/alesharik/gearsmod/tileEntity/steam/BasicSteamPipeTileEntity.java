@@ -55,7 +55,6 @@ public final class BasicSteamPipeTileEntity extends TileEntity implements SteamS
         steamStorage.getNetwork().destroyBlock(pos);
     }
 
-    @Nonnull
     @Override
     public SteamStorage getSteamStorage() {
         return steamStorage;

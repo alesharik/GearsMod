@@ -27,6 +27,7 @@ import com.alesharik.gearsmod.capability.smoke.SmokeHandlerUpdateListener;
 import com.alesharik.gearsmod.capability.steam.SteamStorage;
 import com.alesharik.gearsmod.steam.SteamNetworkHandler;
 import com.alesharik.gearsmod.steam.SteamStorageProvider;
+import com.alesharik.gearsmod.temperature.BiomeTemperatureManager;
 import com.alesharik.gearsmod.tileEntity.FieldTileEntity;
 import com.alesharik.gearsmod.util.ModLoggerHolder;
 import com.alesharik.gearsmod.util.PhysicMath;
@@ -82,7 +83,6 @@ public final class BasicSteamBoilerTileEntity extends FieldTileEntity implements
         store = new SimpleTileEntityFieldStore(GearsMod.getNetworkWrapper());
         lastMJ = 0;
         temperature = 100;
-        minTemperature = 50;
     }
 
     @Override
@@ -102,6 +102,9 @@ public final class BasicSteamBoilerTileEntity extends FieldTileEntity implements
 
         steamHandler = SteamNetworkHandler.getStorageForBlock(world, pos, 1000, 1200 * 1000 * 1000, aDouble -> ModLoggerHolder.getModLogger().log(Level.ERROR, "Ok"));
         steamHandler.getNetwork().initBlock(pos);
+
+        minTemperature = BiomeTemperatureManager.getTemperatureManager(world.getBiome(pos), world).getTemperatureSmart(world, pos);
+        temperature = minTemperature;
     }
 
     @Override

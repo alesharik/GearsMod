@@ -28,6 +28,7 @@ import com.alesharik.gearsmod.capability.steam.SteamCapability;
 import com.alesharik.gearsmod.gui.GuiHandler;
 import com.alesharik.gearsmod.integration.IntegrationManager;
 import com.alesharik.gearsmod.integration.theoneprobe.TheOneProbeIntegrationModule;
+import com.alesharik.gearsmod.item.ItemOverlaysRenderer;
 import com.alesharik.gearsmod.item.ModItems;
 import com.alesharik.gearsmod.tileEntity.ModTileEntities;
 import com.alesharik.gearsmod.util.ExecutionUtils;
@@ -38,6 +39,7 @@ import net.minecraft.item.Item;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.client.model.obj.OBJLoader;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -124,6 +126,8 @@ public class CommonProxy implements ExecutionUtils.Executor, CurrentWorldProvide
 
             ModItems.clientRegister();
             ModTileEntities.clientRegister();
+
+            MinecraftForge.EVENT_BUS.register(new ItemOverlaysRenderer());
         }
 
         @Override

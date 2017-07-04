@@ -56,6 +56,11 @@ final class Calculator {
             SteamStorage steamStorage;
             if(tileEntity instanceof SteamStorageProvider) {
                 steamStorage = ((SteamStorageProvider) tileEntity).getSteamStorage();
+                if(steamStorage == null && tileEntity.hasCapability(SteamCapability.CAPABILITY, null)) {
+                    steamStorage = tileEntity.getCapability(SteamCapability.CAPABILITY, null);
+                    if(steamStorage == null)
+                        continue;
+                }
             } else if(tileEntity.hasCapability(SteamCapability.CAPABILITY, null)) {
                 steamStorage = tileEntity.getCapability(SteamCapability.CAPABILITY, null);
                 if(steamStorage == null)

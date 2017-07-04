@@ -37,6 +37,8 @@ public final class ModItems {
     public static ItemBlock SIMPLE_SOLAR_PANEL_ITEM;
     public static ItemBlock BASIC_STEAM_PIPE_ITEM;
 
+    public static PortableThermometer PORTABLE_THERMOMETER;
+
     private ModItems() {
     }
 
@@ -76,6 +78,9 @@ public final class ModItems {
         BASIC_STEAM_PIPE_ITEM.setRegistryName("basic_steam_pipe");
         BASIC_STEAM_PIPE_ITEM.setCreativeTab(getCreativeTab());
         registry.register(BASIC_STEAM_PIPE_ITEM);
+
+        PORTABLE_THERMOMETER = new PortableThermometer();
+        registry.register(PORTABLE_THERMOMETER);
     }
 
     @SideOnly(Side.CLIENT)
@@ -88,5 +93,9 @@ public final class ModItems {
         modelMesher.register(SIMPLE_SOLAR_PANEL_ITEM, 0, new ModelResourceLocation("gearsmod:simple_solar_panel", "inventory"));
 
         modelMesher.register(BASIC_STEAM_PIPE_ITEM, 0, new ModelResourceLocation("gearsmod:basic_steam_pipe", "inventory"));
+
+        modelMesher.register(PORTABLE_THERMOMETER, 0, new ModelResourceLocation("gearsmod:portable_thermometer", "inventory"));
+        modelMesher.register(PORTABLE_THERMOMETER, 1, new ModelResourceLocation("gearsmod:portable_thermometer", "inventory"));
+        modelMesher.register(PORTABLE_THERMOMETER, 2, new ModelResourceLocation("gearsmod:portable_thermometer", "inventory"));
     }
 }
