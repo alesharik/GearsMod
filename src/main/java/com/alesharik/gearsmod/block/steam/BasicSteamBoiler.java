@@ -110,11 +110,11 @@ public final class BasicSteamBoiler extends BlockMachine {
     @Override
     public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
         TileEntity tileEntity = worldIn.getTileEntity(pos);
+        super.breakBlock(worldIn, pos, state);
         if(tileEntity instanceof BasicSteamBoilerTileEntity) {
             ((BasicSteamBoilerTileEntity) tileEntity).dropItems();
             ((BasicSteamBoilerTileEntity) tileEntity).onRemove();
         }
-        super.breakBlock(worldIn, pos, state);
     }
 
     @Override

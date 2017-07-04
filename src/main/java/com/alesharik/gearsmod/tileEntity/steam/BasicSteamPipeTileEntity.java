@@ -25,6 +25,7 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.Explosion;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.capabilities.Capability;
 
 import javax.annotation.Nonnull;
@@ -39,10 +40,13 @@ public final class BasicSteamPipeTileEntity extends TileEntity implements SteamS
 
     @Override
     public void onLoad() {
-        steamStorage = SteamNetworkHandler.getStorageForBlock(world, pos, 800, 1200, aDouble -> {
-            Explosion explosion = world.createExplosion(new EntityItem(world), pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 20, true);
-            explosion.doExplosionA();
-            explosion.doExplosionB(true);
+        steamStorage = SteamNetworkHandler.getStorageForBlock(world, pos, 800, 1200 * 1000 * 1000, aDouble -> {
+            if(world instanceof WorldServer)
+                ((WorldServer) world).addScheduledTask(() -> {
+                    Explosion explosion = world.createExplosion(new EntityItem(world), pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 20, true);
+                    explosion.doExplosionA();
+//                    explosion.doExplosionB(true);
+                });
         });
         steamStorage.getNetwork().initBlock(pos);
     }

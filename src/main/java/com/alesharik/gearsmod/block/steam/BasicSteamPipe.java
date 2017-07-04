@@ -78,9 +78,9 @@ public final class BasicSteamPipe extends BlockPipe {
     @Override
     public void breakBlock(World worldIn, @Nonnull BlockPos pos, @Nonnull IBlockState state) {
         TileEntity tileEntity = worldIn.getTileEntity(pos);
+        super.breakBlock(worldIn, pos, state);
         if(tileEntity != null && tileEntity instanceof BasicSteamPipeTileEntity)
             ((BasicSteamPipeTileEntity) tileEntity).onRemove();
-        super.breakBlock(worldIn, pos, state);
     }
 
     @Nonnull

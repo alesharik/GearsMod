@@ -45,6 +45,10 @@ final class SteamStorageImpl implements SteamStorage {
         return network;
     }
 
+    void setNetwork(SteamNetwork network) {
+        networkUpdater.set(this, network);
+    }
+
     @Override
     public double getMaxForce() {
         return maxForce;

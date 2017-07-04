@@ -62,7 +62,20 @@ public class SteamProbeInfoProvider implements IProbeInfoProvider {
         ProgressStyle style = new ProgressStyle();
         style.backgroundColor(progressBarDefaultColor);
         style.alternateFilledColor(progressBarDefaultColor);
+        style.prefix("Pressure: ");
 
-        probeInfo.progress(Math.round(network.getPressure()), Math.round(network.getPressure()), style);
+        double pressure = network.getPressure();//In MPa
+        if(pressure < 1) { //Downgrade to KPa
+            pressure = pressure * 1000;
+            if(pressure < 1) { //Downgrade to Pa
+                pressure = pressure * 1000;
+                style.suffix(" Pa");
+            } else {
+                style.suffix(" KPa");
+            }
+        } else {
+            style.suffix(" MPa");
+        }
+        probeInfo.progress(Math.round(pressure), Math.round(pressure), style);
     }
 }

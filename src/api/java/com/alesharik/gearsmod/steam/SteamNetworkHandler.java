@@ -57,6 +57,19 @@ public final class SteamNetworkHandler {
         return storage;
     }
 
+    static SteamNetwork getSteamNetwork(World world, BlockPos pos) {
+        int id = world.provider.getDimension();
+        WorldSteamNetworks network;
+        if(networks.containsKey(id)) {
+            network = networks.get(id);
+        } else {
+            network = WorldSteamNetworks.getNetworks(world);
+            networks.put(id, network);
+        }
+
+        return network.getNetwork(world, pos);
+    }
+
     static void markDirty(BasicSteamNetwork network) {
         for(WorldSteamNetworks worldSteamNetworks : networks.values()) {
             if(worldSteamNetworks.markDirty(network))

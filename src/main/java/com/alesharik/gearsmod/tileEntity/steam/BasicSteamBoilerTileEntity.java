@@ -29,8 +29,10 @@ import com.alesharik.gearsmod.steam.SteamNetworkHandler;
 import com.alesharik.gearsmod.steam.SteamStorageProvider;
 import com.alesharik.gearsmod.tileEntity.FieldTileEntity;
 import com.alesharik.gearsmod.util.ModLoggerHolder;
+import com.alesharik.gearsmod.util.PhysicMath;
 import com.alesharik.gearsmod.util.WorldUtils;
 import com.alesharik.gearsmod.util.field.SimpleTileEntityFieldStore;
+import com.alesharik.gearsmod.util.provider.TemperatureProvider;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -59,7 +61,7 @@ import java.util.Random;
 
 import static com.alesharik.gearsmod.util.PhysicMath.*;
 
-public final class BasicSteamBoilerTileEntity extends FieldTileEntity implements ITickable, SteamStorageProvider {
+public final class BasicSteamBoilerTileEntity extends FieldTileEntity implements ITickable, SteamStorageProvider, TemperatureProvider {
     private static final Random RANDOM = new SecureRandom();
 
     private final SmokeHandler smokeHandler;
@@ -69,6 +71,7 @@ public final class BasicSteamBoilerTileEntity extends FieldTileEntity implements
 
     private volatile double lastMJ;
     private volatile double temperature; //In Celsius
+    private volatile double minTemperature;
 
     public BasicSteamBoilerTileEntity() {
         super();
@@ -79,6 +82,7 @@ public final class BasicSteamBoilerTileEntity extends FieldTileEntity implements
         store = new SimpleTileEntityFieldStore(GearsMod.getNetworkWrapper());
         lastMJ = 0;
         temperature = 100;
+        minTemperature = 50;
     }
 
     @Override
@@ -96,7 +100,7 @@ public final class BasicSteamBoilerTileEntity extends FieldTileEntity implements
         fluidHandler.setFacing(world.getBlockState(pos).getValue(BlockMachine.FACING).rotateY());
         fluidHandler.sync(Side.SERVER);
 
-        steamHandler = SteamNetworkHandler.getStorageForBlock(world, pos, 1000, 10000, aDouble -> ModLoggerHolder.getModLogger().log(Level.ERROR, "Ok"));
+        steamHandler = SteamNetworkHandler.getStorageForBlock(world, pos, 1000, 1200 * 1000 * 1000, aDouble -> ModLoggerHolder.getModLogger().log(Level.ERROR, "Ok"));
         steamHandler.getNetwork().initBlock(pos);
     }
 
@@ -207,9 +211,16 @@ public final class BasicSteamBoilerTileEntity extends FieldTileEntity implements
             if(smokeHandler.overloaded())
                 smokeHandler.extract((int) (2 + Math.round((smokeHandler.getSmokeAmount() * 1.0F / smokeHandler.getMaxSmokeAmount()) * 1.5)), false);
 
+            if(temperature < minTemperature)
+                temperature = minTemperature;
+            else if(temperature + 75 > PhysicMath.MAX_STEAM_TEMPERATURE)
+                temperature = PhysicMath.MAX_STEAM_TEMPERATURE - 75;
+
             if(!isWorking()) {
                 FluidStack drain = fluidHandler.drain(1, false);
                 if(fluidHandler.getFluid() == null || (drain != null && drain.amount <= 0)) {
+                    temperature -= 1F / 50;
+                    steamHandler.getNetwork().syncTemperature(temperature);
                     return;
                 }
 
@@ -221,7 +232,8 @@ public final class BasicSteamBoilerTileEntity extends FieldTileEntity implements
                     ItemStack itemStack = coalItemStackHandler.getStackInSlot(0);
                     itemStack.setCount(itemStack.getCount() - 1);
                 } else {
-                    temperature -= 1F / 20;
+                    temperature -= 1F / 50;
+                    steamHandler.getNetwork().syncTemperature(temperature);
                 }
             } else {
                 FluidStack drain = fluidHandler.drain(1, false);
@@ -229,6 +241,10 @@ public final class BasicSteamBoilerTileEntity extends FieldTileEntity implements
                     setWorking(false);
                     return;
                 }
+
+                temperature += 1F / 20;
+                if(temperature < 100)
+                    return;
 
                 double mjRequired = getMegaJoulesWithEfficiency(MEGA_JOULES_PER_MILLI_BUCKET, smokeHandler.getSmokeAmount(), smokeHandler.getMaxSmokeAmount());
                 if(mjRequired == 0) {
@@ -242,16 +258,13 @@ public final class BasicSteamBoilerTileEntity extends FieldTileEntity implements
                     return;
                 }
 
-                fluidHandler.drain(1, true);
+                fluidHandler.drain(10, true);
 
-                temperature += 1F / 20;
                 lastMJ -= mjRequired;
-                steamHandler.getNetwork().addSteam(1, temperature);
+                steamHandler.getNetwork().addSteam(10, temperature);
 
                 smokeHandler.receiveInternal(10);
             }
-            if(temperature < 100)
-                temperature = 100;
             markDirty();
         } else {
             if(smokeHandler.overloaded()) {
@@ -290,5 +303,15 @@ public final class BasicSteamBoilerTileEntity extends FieldTileEntity implements
 
     public void onRemove() {
         steamHandler.getNetwork().destroyBlock(pos);
+    }
+
+    @Override
+    public double getTemperature() {
+        return temperature;
+    }
+
+    @Override
+    public double getMaxTemperature() {
+        return PhysicMath.MAX_STEAM_TEMPERATURE;
     }
 }

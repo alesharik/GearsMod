@@ -27,9 +27,12 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.stream.IntStream;
@@ -41,6 +44,7 @@ public class BasicSteamNetwork implements SteamNetwork, INBTSerializable<NBTTagC
      * Measures in MPa
      */
     final AtomicDouble pressure;
+    final AtomicDouble pressureVolume;
     /**
      * Measures in Kelvin
      */
@@ -59,18 +63,20 @@ public class BasicSteamNetwork implements SteamNetwork, INBTSerializable<NBTTagC
         poses = new CopyOnWriteArraySet<>();
         this.world = world;
         this.volume = new AtomicDouble();
+        this.pressureVolume = new AtomicDouble();
     }
 
     @Override
     public void addSteam(double volume, double temperature) {
-        this.temperature.set(this.temperature.get() + PhysicMath.celsiusToKelvin(temperature) / 2F);
+        syncTemperature(temperature);
+        this.pressureVolume.addAndGet(volume);
         this.pressure.addAndGet(PhysicMath.getSteamPressureForTemperature(this.temperature.get()) * volume);
-        recalculatePressure(this.volume.get(), this.temperature.get(), pressure, world, poses);
+        recalculatePressure(this.volume.get(), pressureVolume.get(), this.temperature.get(), pressure, world, poses);
     }
 
     @Override
     public boolean removeSteam(double volume) {
-        double pressureToRemove = PhysicMath.getSteamPressureForTemperature(this.temperature.get());
+        double pressureToRemove = PhysicMath.getSteamPressureForTemperature(this.temperature.get()) * volume;
 
         double pr = this.pressure.get();
         double val = pr - pressureToRemove;
@@ -82,13 +88,15 @@ public class BasicSteamNetwork implements SteamNetwork, INBTSerializable<NBTTagC
             if(val < 0)
                 return false;
         }
-        recalculatePressure(this.volume.get(), this.temperature.get(), pressure, world, poses);
+        this.pressureVolume.addAndGet(-volume);
+        recalculatePressure(this.volume.get(), this.pressureVolume.get(), this.temperature.get(), pressure, world, poses);
         return true;
     }
 
     @Override
     public void syncTemperature(double t) {
-        this.pressure.set(this.pressure.get() + PhysicMath.celsiusToKelvin(t) / 2F);
+        double delta = PhysicMath.celsiusToKelvin(t) - this.temperature.get();
+        this.temperature.addAndGet(delta / 2);
     }
 
     @Override
@@ -103,6 +111,9 @@ public class BasicSteamNetwork implements SteamNetwork, INBTSerializable<NBTTagC
 
     @Override
     public void initBlock(BlockPos pos) {
+        if(FMLCommonHandler.instance().getEffectiveSide().isClient())
+            return;
+
         if(!poses.contains(pos)) {
             addBlockPos(pos);
         }
@@ -110,6 +121,9 @@ public class BasicSteamNetwork implements SteamNetwork, INBTSerializable<NBTTagC
 
     @Override
     public void destroyBlock(BlockPos pos) {
+        if(FMLCommonHandler.instance().getEffectiveSide().isClient())
+            return;
+
         if(poses.contains(pos)) {
             removeBlockPos(pos);
         }
@@ -122,41 +136,60 @@ public class BasicSteamNetwork implements SteamNetwork, INBTSerializable<NBTTagC
     boolean validBlockPos(IBlockAccess world, BlockPos pos) {
         if(poses.contains(pos))
             return true;
-        for(BlockPos blockPos : poses) {
-            TileEntity tileEntity = world.getTileEntity(blockPos);
-            if(tileEntity == null)
-                continue;
 
-            EnumFacing[] facing;
-            if(tileEntity instanceof SteamStorageProvider)
-                facing = ((SteamStorageProvider) tileEntity).getConnectedFacing();
-            else
-                facing = calcFacing(tileEntity);
+        TileEntity tileEntity = world.getTileEntity(pos);
+        if(tileEntity == null)
+            return false;
 
-            for(EnumFacing enumFacing : facing) {
-                if(blockPos.offset(enumFacing) == pos)
-                    return true;
+        EnumFacing[] facing;
+        if(tileEntity instanceof SteamStorageProvider)
+            facing = ((SteamStorageProvider) tileEntity).getConnectedFacing();
+        else
+            facing = calcFacing(tileEntity);
+
+        for(EnumFacing enumFacing : facing) {
+            BlockPos near = pos.offset(enumFacing);
+            if(poses.contains(near)) {
+                TileEntity nearTileEntity = world.getTileEntity(pos);
+                if(nearTileEntity == null)
+                    return false;
+
+                EnumFacing[] facing1;
+                if(nearTileEntity instanceof SteamStorageProvider)
+                    facing1 = ((SteamStorageProvider) nearTileEntity).getConnectedFacing();
+                else
+                    facing1 = calcFacing(nearTileEntity);
+
+                for(EnumFacing enumFacing1 : facing1) {
+                    if(enumFacing.getOpposite() == enumFacing1)
+                        return true;
+                }
             }
         }
+
         return false;
     }
 
     void addBlockPos(BlockPos pos) {
         poses.add(pos);
         recalculateVolume(world, poses, volume);
-        recalculatePressure(volume.get(), temperature.get(), pressure, world, poses);
+        recalculatePressure(volume.get(), pressureVolume.get(), temperature.get(), pressure, world, poses);
 
         SteamNetworkHandler.markDirty(this);
+        if(world instanceof WorldServer)
+            Calculator.checkCorrectness((WorldServer) world, new ArrayList<>(poses));
     }
 
     void removeBlockPos(BlockPos pos) {
         poses.remove(pos);
         recalculateVolume(world, poses, volume);
-        recalculatePressure(volume.get(), temperature.get(), pressure, world, poses);
+        recalculatePressure(volume.get(), pressureVolume.get(), temperature.get(), pressure, world, poses);
 
         SteamNetworkHandler.markDirty(this);
         if(poses.size() == 0)
             SteamNetworkHandler.deleteNetwork(this);
+        else if(world instanceof WorldServer)
+            Calculator.checkCorrectness((WorldServer) world, new ArrayList<>(poses));
     }
 
     int getPoseCount() {
@@ -186,6 +219,7 @@ public class BasicSteamNetwork implements SteamNetwork, INBTSerializable<NBTTagC
         NBTTagCompound compound = new NBTTagCompound();
         compound.setDouble("pressure", pressure.get());
         compound.setDouble("temperature", temperature.get());
+        compound.setDouble("pressureVolume", pressureVolume.get());
         NBTTagList blockPoses = new NBTTagList();
         poses.stream()
                 .map(BlockPos::toLong)
@@ -207,8 +241,8 @@ public class BasicSteamNetwork implements SteamNetwork, INBTSerializable<NBTTagC
                 .map(NBTTagLong::getLong)
                 .map(BlockPos::fromLong)
                 .forEach(poses::add);
-
+        pressureVolume.set(nbt.getDouble("pressureVolume"));
         recalculateVolume(world, poses, volume);
-        recalculatePressure(volume.get(), temperature.get(), pressure, world, poses);
+        recalculatePressure(volume.get(), pressureVolume.get(), temperature.get(), pressure, world, poses);
     }
 }

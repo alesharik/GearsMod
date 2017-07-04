@@ -23,12 +23,13 @@ import net.minecraft.tileentity.TileEntityFurnace;
 
 @SuppressWarnings("WeakerAccess")
 public final class PhysicMath {
+    public static final double MAX_STEAM_TEMPERATURE = 647.3 - 273.15;
+
     public static final double WATER_BUCKETS_FOR_COAL = 10;
     public static final double MEGA_JOULES_PER_WATER_BUCKET = 2.256;
     public static final double MEGA_JOULES_PER_MILLI_BUCKET = MEGA_JOULES_PER_WATER_BUCKET / 1000;
     public static final int COAL_BURN_TIME = TileEntityFurnace.getItemBurnTime(new ItemStack(Items.COAL));
     public static final double COAL_MEGA_JOULES = MEGA_JOULES_PER_WATER_BUCKET * WATER_BUCKETS_FOR_COAL;
-    private static final double ONE_MEGA_PASCAL = Math.pow(10, 6);
     private static final double N1_FOR_STEAM_CURVE = 1167.0521452767;
     private static final double N2_FOR_STEAM_CURVE = -724213.16703206;
     private static final double N3_FOR_STEAM_CURVE = -17.073846940092;
@@ -71,7 +72,7 @@ public final class PhysicMath {
         double c = N6_FOR_STEAM_CURVE * powOfTheta + N7_FOR_STEAM_CURVE * theta + N8_FOR_STEAM_CURVE;
 
         double beta = (-b - Math.sqrt(Math.pow(b, 2) - 4 * a * c)) / (2 * a);
-        return PRESSURE_ZERO * Math.pow(beta, 4) / ONE_MEGA_PASCAL;
+        return PRESSURE_ZERO * Math.pow(beta, 4) / 1000;
     }
 
     /**
