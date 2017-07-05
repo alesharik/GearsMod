@@ -1,4 +1,4 @@
-description.show.mode=Show mode:
+description.show.mode=Show mode
 description.thermometer.measure.range=Measures from -33° C to 100° C
 description.thermometer.mode.none=Never
 description.thermometer.mode.hold=Only if it is in the hand

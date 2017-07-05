@@ -17,6 +17,7 @@
 
 package com.alesharik.gearsmod.item;
 
+import com.alesharik.gearsmod.Config;
 import com.alesharik.gearsmod.temperature.BiomeTemperatureManager;
 import com.alesharik.gearsmod.util.ScaledScreenResolution;
 import net.minecraft.client.Minecraft;
@@ -102,7 +103,7 @@ public final class ItemOverlaysRenderer {
                     meterHeight = currentMeterHeight;
             }
 
-            translate(ScaledScreenResolution.getScaledWidth() - 36, 6, 0);
+            translate(ScaledScreenResolution.getScaledWidth() - Config.getThermometerOverlayX(), Config.getThermometerOverlayY(), 0);
             enableBlend();
 
             textureManager.bindTexture(texture);

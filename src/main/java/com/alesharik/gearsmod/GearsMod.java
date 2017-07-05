@@ -63,6 +63,7 @@ public class GearsMod {
 
     public GearsMod() {
         MinecraftForge.EVENT_BUS.register(this);
+        MinecraftForge.EVENT_BUS.register(new Config.ConfigChangeListener(MODID));
     }
 
     public static CreativeTabs getCreativeTab() {
@@ -84,6 +85,8 @@ public class GearsMod {
         CurrentWorldProvider.provider.set(CommonProxy.getProxy());
 
         ModLoggerHolder.setModLogger(event.getModLog());
+
+        Config.init(event.getSuggestedConfigurationFile());
 
         CommonProxy.getProxy().preInit(event);
 

@@ -42,7 +42,7 @@ public final class PortableThermometer extends Item {
     @SideOnly(Side.CLIENT)
     @Override
     public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
-        tooltip.add(I18n.format("description.show.mode") + getMode(stack).getNameLocalized());//Mode: NONE
+        tooltip.add(I18n.format("description.show.mode") + ": " + getMode(stack).getNameLocalized());//Mode: NONE
         tooltip.add(I18n.format("description.thermometer.measure.range")); //Measures from -33° C to 100° C
     }
 
