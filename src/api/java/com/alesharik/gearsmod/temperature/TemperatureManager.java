@@ -17,6 +17,7 @@
 
 package com.alesharik.gearsmod.temperature;
 
+import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -24,6 +25,7 @@ import net.minecraft.world.World;
 
 public final class TemperatureManager {
     private static final float temeratureChangePerOneHundredBlocks = 0.65F;
+    private static final EnumFacing[] sidesAndTop = new EnumFacing[]{EnumFacing.SOUTH, EnumFacing.EAST, EnumFacing.WEST, EnumFacing.NORTH, EnumFacing.UP};
 
     private final double defaultTemperature;
     private final int defaultHeight;
@@ -53,18 +55,35 @@ public final class TemperatureManager {
     public double getTemperatureSmart(World world, BlockPos pos) {
         double temp = getTemperature(pos.getY());
 
-        if(canRain && world.isRaining() && world.canBlockSeeSky(pos.offset(EnumFacing.UP))) {
+        BlockPos upOffset = pos.offset(EnumFacing.UP);
+        if(canRain && world.isRaining() && world.canBlockSeeSky(upOffset)) {
             if(defaultTemperature > 0)
                 temp -= 3;
             else
                 temp -= 8;
         }
 
-        BlockPos iteratorPos = pos.offset(EnumFacing.UP);
+        BlockPos iteratorPos = upOffset;
         while(world.getBlockState(iteratorPos).getBlock() == Blocks.WATER || world.getBlockState(iteratorPos).getBlock() == Blocks.FLOWING_WATER) {
             iteratorPos = iteratorPos.offset(EnumFacing.UP);
             temp -= 1;
         }
+
+        for(EnumFacing side : sidesAndTop) {
+            BlockPos offset = pos.offset(side);
+            Block block = world.getBlockState(offset).getBlock();
+            if(block == Blocks.WATER || block == Blocks.FLOWING_WATER)
+                temp -= 1;
+            else if(block == Blocks.LAVA || block == Blocks.FLOWING_LAVA)
+                temp += 1.2;
+            else if(block == Blocks.FIRE)
+                temp += 0.6;
+        }
+
+        if(world.isDaytime() && world.canBlockSeeSky(upOffset))
+            temp += 0.8;
+        else if(!world.isDaytime() && world.canBlockSeeSky(upOffset))
+            temp -= 0.8;
 
         return temp;
     }

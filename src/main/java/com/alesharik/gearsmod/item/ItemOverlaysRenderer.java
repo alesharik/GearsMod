@@ -18,6 +18,7 @@
 package com.alesharik.gearsmod.item;
 
 import com.alesharik.gearsmod.temperature.BiomeTemperatureManager;
+import com.alesharik.gearsmod.util.ScaledScreenResolution;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
@@ -36,7 +37,7 @@ import org.lwjgl.opengl.GL11;
 
 import static net.minecraft.client.renderer.GlStateManager.*;
 
-//TODO add config for location. Add info about it's max and min values(-33; 100)
+//TODO add config for location
 @SideOnly(Side.CLIENT)
 public final class ItemOverlaysRenderer {
     private static final ResourceLocation texture = new ResourceLocation("gearsmod:textures/overlays/portable_thermometer_overlay.png");
@@ -89,7 +90,7 @@ public final class ItemOverlaysRenderer {
             if(timeDelta > 50) {
                 lastTimeStamp = newTimeStamp;
                 BlockPos playerPosition = minecraft.player.getPosition();
-                double temperature = BiomeTemperatureManager.getTemperatureManager(minecraft.world.getBiome(playerPosition), minecraft.world).getTemperature(playerPosition.getY());
+                double temperature = BiomeTemperatureManager.getTemperatureManager(minecraft.world.getBiome(playerPosition), minecraft.world).getTemperatureSmart(minecraft.world, playerPosition);
 
                 int currentMeterHeight = (int) (53 * (temperature + 33) / 133);
 
@@ -101,7 +102,7 @@ public final class ItemOverlaysRenderer {
                     meterHeight = currentMeterHeight;
             }
 
-            translate(minecraft.displayWidth * 0.234375 - 3, 6, 0);
+            translate(ScaledScreenResolution.getScaledWidth() - 36, 6, 0);
             enableBlend();
 
             textureManager.bindTexture(texture);

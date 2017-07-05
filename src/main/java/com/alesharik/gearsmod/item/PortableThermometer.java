@@ -18,6 +18,7 @@
 package com.alesharik.gearsmod.item;
 
 import com.alesharik.gearsmod.GearsMod;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -41,7 +42,8 @@ public final class PortableThermometer extends Item {
     @SideOnly(Side.CLIENT)
     @Override
     public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
-        tooltip.add("Mode: " + getMode(stack).name());
+        tooltip.add(I18n.format("description.show.mode") + getMode(stack).getNameLocalized());//Mode: NONE
+        tooltip.add(I18n.format("description.thermometer.measure.range")); //Measures from -33° C to 100° C
     }
 
     @Override
@@ -95,6 +97,17 @@ public final class PortableThermometer extends Item {
 
         public int getId() {
             return id;
+        }
+
+        @SideOnly(Side.CLIENT)
+        public String getNameLocalized() {
+            if(this == Mode.NONE)
+                return I18n.format("description.thermometer.mode.none");
+            if(this == Mode.HOLD)
+                return I18n.format("description.thermometer.mode.hold");
+            if(this == Mode.ALWAYS)
+                return I18n.format("description.thermometer.mode.always");
+            return "";
         }
 
         public Mode cycle() {
