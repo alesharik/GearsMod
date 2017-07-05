@@ -17,11 +17,14 @@
 
 package com.alesharik.gearsmod.tileEntity;
 
+import com.alesharik.gearsmod.client.render.ThermometerFastTESR;
 import com.alesharik.gearsmod.tileEntity.energy.SimpleSolarPanelTileEntity;
 import com.alesharik.gearsmod.tileEntity.smoke.ChimneyTileEntity;
 import com.alesharik.gearsmod.tileEntity.smoke.SmokePipeTileEntity;
 import com.alesharik.gearsmod.tileEntity.steam.BasicSteamBoilerTileEntity;
 import com.alesharik.gearsmod.tileEntity.steam.BasicSteamPipeTileEntity;
+import com.alesharik.gearsmod.tileEntity.temperature.ThermometerTileEntity;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -32,6 +35,7 @@ public final class ModTileEntities {
     public static final String CHIMNEY_TILE_ENTITY = "GearsChimneyTileEntity";
     public static final String SIMPLE_SOLAR_PANEL_TILE_ENTITY = "GearsSimpleSolarPanelTileEntity";
     public static final String BASIC_STEAM_PIPE_TILE_ENTITY = "GearsBasicSteamPipeTileEntity";
+    public static final String THERMOMETER_TILE_ENTITY = "GearsThermometerTileEntity";
 
     private ModTileEntities() {
     }
@@ -42,10 +46,12 @@ public final class ModTileEntities {
         GameRegistry.registerTileEntity(ChimneyTileEntity.class, CHIMNEY_TILE_ENTITY);
         GameRegistry.registerTileEntity(SimpleSolarPanelTileEntity.class, SIMPLE_SOLAR_PANEL_TILE_ENTITY);
         GameRegistry.registerTileEntity(BasicSteamPipeTileEntity.class, BASIC_STEAM_PIPE_TILE_ENTITY);
+        GameRegistry.registerTileEntity(ThermometerTileEntity.class, THERMOMETER_TILE_ENTITY);
     }
 
     @SideOnly(Side.CLIENT)
     public static void clientRegister() {
 //        ClientRegistry.bindTileEntitySpecialRenderer(ChimneyTileEntity.class, new ChimneyTileEntityRenderer());
+        ClientRegistry.bindTileEntitySpecialRenderer(ThermometerTileEntity.class, new ThermometerFastTESR());
     }
 }

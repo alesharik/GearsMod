@@ -32,6 +32,7 @@ import java.nio.charset.StandardCharsets;
 
 import static org.lwjgl.opengl.GL11.*;
 
+@Deprecated
 @SideOnly(Side.CLIENT)
 public final class ChimneyTileEntityRenderer extends TileEntitySpecialRenderer<ChimneyTileEntity> {
     private static final OBJModel model;

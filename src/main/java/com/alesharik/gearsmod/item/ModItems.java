@@ -36,6 +36,7 @@ public final class ModItems {
     public static ItemBlock SMALL_BRICKS_BLOCK_ITEM;
     public static ItemBlock SIMPLE_SOLAR_PANEL_ITEM;
     public static ItemBlock BASIC_STEAM_PIPE_ITEM;
+    public static ItemBlock THERMOMETER_BLOCK_ITEM;
 
     public static PortableThermometer PORTABLE_THERMOMETER;
 
@@ -78,6 +79,12 @@ public final class ModItems {
         BASIC_STEAM_PIPE_ITEM.setRegistryName("basic_steam_pipe");
         BASIC_STEAM_PIPE_ITEM.setCreativeTab(getCreativeTab());
         registry.register(BASIC_STEAM_PIPE_ITEM);
+
+        THERMOMETER_BLOCK_ITEM = new ItemBlock(ModBlocks.THERMOMETER_BLOCK);
+        THERMOMETER_BLOCK_ITEM.setUnlocalizedName("thermometer_block");
+        THERMOMETER_BLOCK_ITEM.setRegistryName("thermometer_block");
+        THERMOMETER_BLOCK_ITEM.setCreativeTab(getCreativeTab());
+        registry.register(THERMOMETER_BLOCK_ITEM);
 
         PORTABLE_THERMOMETER = new PortableThermometer();
         registry.register(PORTABLE_THERMOMETER);

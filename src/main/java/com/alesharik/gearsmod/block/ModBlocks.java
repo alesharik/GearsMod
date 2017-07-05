@@ -23,6 +23,7 @@ import com.alesharik.gearsmod.block.smoke.ChimneyBlock;
 import com.alesharik.gearsmod.block.smoke.SmokePipe;
 import com.alesharik.gearsmod.block.steam.BasicSteamBoiler;
 import com.alesharik.gearsmod.block.steam.BasicSteamPipe;
+import com.alesharik.gearsmod.block.temperature.ThermometerBlock;
 import net.minecraft.block.Block;
 import net.minecraftforge.fml.common.registry.IForgeRegistry;
 
@@ -35,6 +36,7 @@ public final class ModBlocks {
     public static final SmallBricksBlock SMALL_BRICKS_BLOCK = new SmallBricksBlock();
     public static final SimpleSolarPanelBlock SIMPLE_SOLAR_PANEL = new SimpleSolarPanelBlock();
     public static final BasicSteamPipe BASIC_STEAM_PIPE = new BasicSteamPipe();
+    public static final ThermometerBlock THERMOMETER_BLOCK = new ThermometerBlock();
 
     private ModBlocks() {
     }
@@ -46,5 +48,6 @@ public final class ModBlocks {
         registry.register(SMALL_BRICKS_BLOCK.setCreativeTab(getCreativeTab()));
         registry.register(SIMPLE_SOLAR_PANEL.setCreativeTab(getCreativeTab()));
         registry.register(BASIC_STEAM_PIPE.setCreativeTab(getCreativeTab()));
+        registry.register(THERMOMETER_BLOCK.setCreativeTab(getCreativeTab()));
     }
 }

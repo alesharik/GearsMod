@@ -23,7 +23,7 @@ import com.alesharik.gearsmod.capability.steam.SteamCapability;
 import com.alesharik.gearsmod.material.ModMaterials;
 import com.alesharik.gearsmod.steam.SteamStorageProvider;
 import com.alesharik.gearsmod.tileEntity.steam.BasicSteamPipeTileEntity;
-import com.alesharik.gearsmod.util.RotationUtils;
+import com.alesharik.gearsmod.util.rotation.RotationUtils;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
