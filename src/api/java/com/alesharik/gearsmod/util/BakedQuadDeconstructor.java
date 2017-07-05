@@ -88,8 +88,8 @@ public final class BakedQuadDeconstructor {
                     selector++;
 
                     builder.setNormalX(((combined) & 0xFF) / 0x7F);
-                    builder.setNormalX(((combined >> 8) & 0xFF) / 0x7F);
-                    builder.setNormalX(((combined >> 16) & 0xFF) / 0x7F);
+                    builder.setNormalY(((combined >> 8) & 0xFF) / 0x7F);
+                    builder.setNormalZ(((combined >> 16) & 0xFF) / 0x7F);
                 }
             }
             vertexes.add(builder.createVertexInfo());
