@@ -99,9 +99,8 @@ public abstract class BlockPipe extends BlockContainer {
 
     @Override
     public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
-        for(EnumFacing side : CONNECTION_PROPERTIES_MAP.keySet()) {
-            state = state.withProperty(CONNECTION_PROPERTIES_MAP.get(side),
-                    canConnect(worldIn, pos.offset(side), side));
+        for(Map.Entry<EnumFacing, IProperty<Boolean>> entry : CONNECTION_PROPERTIES_MAP.entrySet()) {
+            state = state.withProperty(entry.getValue(), canConnect(worldIn, pos.offset(entry.getKey()), entry.getKey()));
         }
         worldIn.setBlockState(pos, state);
     }
@@ -111,9 +110,8 @@ public abstract class BlockPipe extends BlockContainer {
     public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
         IBlockState state = super.getDefaultState();
 
-        for(EnumFacing side : CONNECTION_PROPERTIES_MAP.keySet()) {
-            state = state.withProperty(CONNECTION_PROPERTIES_MAP.get(side),
-                    canConnect(worldIn, pos.offset(side), side));
+        for(Map.Entry<EnumFacing, IProperty<Boolean>> entry : CONNECTION_PROPERTIES_MAP.entrySet()) {
+            state = state.withProperty(entry.getValue(), canConnect(worldIn, pos.offset(entry.getKey()), entry.getKey()));
         }
         return state;
     }
@@ -139,9 +137,8 @@ public abstract class BlockPipe extends BlockContainer {
     @Nonnull
     @Override
     public IBlockState getActualState(@Nonnull IBlockState state, IBlockAccess worldIn, BlockPos pos) {
-        for(EnumFacing side : CONNECTION_PROPERTIES_MAP.keySet()) {
-            state = state.withProperty(CONNECTION_PROPERTIES_MAP.get(side),
-                    canConnect(worldIn, pos.offset(side), side));
+        for(Map.Entry<EnumFacing, IProperty<Boolean>> entry : CONNECTION_PROPERTIES_MAP.entrySet()) {
+            state = state.withProperty(entry.getValue(), canConnect(worldIn, pos.offset(entry.getKey()), entry.getKey()));
         }
         return state;
     }

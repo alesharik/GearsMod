@@ -69,6 +69,8 @@ final class Calculator {
                 continue;
             }
 
+            if(steamStorage == null)
+                continue;
             value += steamStorage.getVolume();
         }
         store.set(value);
@@ -212,7 +214,6 @@ final class Calculator {
             myPoses.add(first);
 
             List<BlockPos> otherPoses = new ArrayList<>();
-            List<BlockPos> alone = new ArrayList<>();
 
             for(Map.Entry<BlockPos, EnumFacing[]> entry : poses.entrySet()) {
                 if(entry.getKey() == first)
@@ -238,11 +239,9 @@ final class Calculator {
                     if(!ok)
                         otherPoses.add(entry.getKey());
                 } else {
-                    alone.add(entry.getKey());
+                    world.addScheduledTask(new UpdateNetworksTask(world, Collections.singletonList(entry.getKey()), SteamNetworkHandler.getSteamNetwork(world, entry.getKey())));
                 }
             }
-
-            alone.forEach(pos -> world.addScheduledTask(new UpdateNetworksTask(world, Collections.singletonList(pos), SteamNetworkHandler.getSteamNetwork(world, pos))));
 
             if(otherPoses.size() > 0)
                 Utils.getModForkJoinPool().execute(new ExtractNewNetworkFromBlocksTask(otherPoses.stream()

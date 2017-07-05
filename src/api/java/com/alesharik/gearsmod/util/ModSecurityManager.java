@@ -39,7 +39,6 @@ public abstract class ModSecurityManager extends SecurityManager {
      * @return current instance
      * @throws SecurityManagerNotInitializedException if {@link ModSecurityManager} hadn't been set
      */
-    @Nonnull
     public static ModSecurityManager getInstance() {
         ModSecurityManager securityManager = INSTANCE.get();
         if(securityManager == null)

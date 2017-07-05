@@ -39,7 +39,6 @@ public final class ModLoggerHolder {
      * @throws java.security.AccessControlException if caller class doesn't have rights to get logger
      * @throws LoggerNotInitializedException        if logger hadn't been set
      */
-    @Nonnull
     public static Logger getModLogger() {
         ModSecurityManager.getInstance().checkGetLogger();
 

@@ -43,7 +43,6 @@ public final class SimpleSolarPanelBlock extends BlockMachine {
         setUnlocalizedName("simple_solar_panel");
     }
 
-    @Nonnull
     @Override
     public TileEntity createNewTileEntity(@Nonnull World worldIn, int meta) {
         return new SimpleSolarPanelTileEntity();

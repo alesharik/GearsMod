@@ -47,7 +47,6 @@ public final class WorldSteamNetworks extends ConcurrentWorldSavedData {
             throw new IllegalArgumentException("DataIdentifier " + name + " must be " + NAME);
     }
 
-    @Nonnull
     public static WorldSteamNetworks getNetworks(@Nonnull World world) {
         MapStorage storage = world.getPerWorldStorage();
         WorldSteamNetworks instance = (WorldSteamNetworks) storage.getOrLoadData(WorldSteamNetworks.class, NAME);

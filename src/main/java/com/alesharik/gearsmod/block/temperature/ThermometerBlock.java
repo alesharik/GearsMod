@@ -52,7 +52,6 @@ public final class ThermometerBlock extends BlockMachine {
         return false;
     }
 
-    @Nonnull
     @Override
     public TileEntity createNewTileEntity(@Nonnull World worldIn, int meta) {
         return new ThermometerTileEntity();

@@ -35,7 +35,6 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Map;
 
@@ -88,16 +87,17 @@ public final class SmokePipe extends BlockPipe {
                     case NORTH:
                         ret = ret.union(new AxisAlignedBB(SIDE_CONNECTION_AABB.minZ, SIDE_CONNECTION_AABB.minY, 1 - SIDE_CONNECTION_AABB.minX,
                                 SIDE_CONNECTION_AABB.maxZ, SIDE_CONNECTION_AABB.maxY, 1 - SIDE_CONNECTION_AABB.maxX));
-
+                        break;
+                    default:
+                        throw new IllegalStateException("Unexpected facing " + facing.name());
                 }
             }
         }
         return ret;
     }
 
-    @ParametersAreNonnullByDefault
     @Override
-    public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isPistonMoving) {
+    public void addCollisionBoxToList(IBlockState state, @Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull AxisAlignedBB entityBox, @Nonnull List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isPistonMoving) {
         IBlockState actual = state.getActualState(worldIn, pos);
 
         addCollisionBoxToList(pos, entityBox, collidingBoxes, BASE_AABB);
@@ -127,6 +127,8 @@ public final class SmokePipe extends BlockPipe {
                         addCollisionBoxToList(pos, entityBox, collidingBoxes, new AxisAlignedBB(SIDE_CONNECTION_AABB.minZ, SIDE_CONNECTION_AABB.minY, 1 - SIDE_CONNECTION_AABB.minX,
                                 SIDE_CONNECTION_AABB.maxZ, SIDE_CONNECTION_AABB.maxY, 1 - SIDE_CONNECTION_AABB.maxX));
                         break;
+                    default:
+                        throw new IllegalStateException("Unexpected facing " + facing.name());
                 }
             }
         }

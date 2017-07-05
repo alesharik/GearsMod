@@ -38,7 +38,6 @@ import org.lwjgl.opengl.GL11;
 
 import static net.minecraft.client.renderer.GlStateManager.*;
 
-//TODO add config for location
 @SideOnly(Side.CLIENT)
 public final class ItemOverlaysRenderer {
     private static final ResourceLocation texture = new ResourceLocation("gearsmod:textures/overlays/portable_thermometer_overlay.png");

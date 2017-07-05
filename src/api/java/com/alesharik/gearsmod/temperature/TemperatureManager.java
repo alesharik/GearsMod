@@ -49,7 +49,7 @@ public final class TemperatureManager {
      */
     public double getTemperature(int height) {
         int dHeight = height - defaultHeight;
-        return defaultTemperature + (dHeight / 100 * temeratureChangePerOneHundredBlocks);
+        return defaultTemperature + (dHeight / 100F * temeratureChangePerOneHundredBlocks);
     }
 
     public double getTemperatureSmart(World world, BlockPos pos) {

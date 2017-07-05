@@ -189,7 +189,6 @@ public final class BasicSteamBoilerTileEntity extends FieldTileEntity implements
         return compound;
     }
 
-    @Nonnull
     @Override
     public SPacketUpdateTileEntity getUpdatePacket() {
         return new SPacketUpdateTileEntity(pos, 1, serializeNBT());
