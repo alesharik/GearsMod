@@ -17,14 +17,15 @@
 
 package com.alesharik.gearsmod.temperature;
 
-import net.minecraft.block.Block;
+import com.alesharik.gearsmod.util.WorldUtils;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fluids.Fluid;
 
 public final class TemperatureManager {
-    private static final float temeratureChangePerOneHundredBlocks = 0.65F;
+    private static final float temperatureChangePerOneHundredBlocks = 0.65F;
     private static final EnumFacing[] sidesAndTop = new EnumFacing[]{EnumFacing.SOUTH, EnumFacing.EAST, EnumFacing.WEST, EnumFacing.NORTH, EnumFacing.UP};
 
     private final double defaultTemperature;
@@ -49,10 +50,10 @@ public final class TemperatureManager {
      */
     public double getTemperature(int height) {
         int dHeight = height - defaultHeight;
-        return defaultTemperature + (dHeight / 100F * temeratureChangePerOneHundredBlocks);
+        return defaultTemperature + (dHeight / 100F * temperatureChangePerOneHundredBlocks);
     }
 
-    public double getTemperatureSmart(World world, BlockPos pos) {
+    public double getTemperatureSmart(World world, BlockPos pos, boolean handleLiquid) {
         double temp = getTemperature(pos.getY());
 
         BlockPos upOffset = pos.offset(EnumFacing.UP);
@@ -71,13 +72,13 @@ public final class TemperatureManager {
 
         for(EnumFacing side : sidesAndTop) {
             BlockPos offset = pos.offset(side);
-            Block block = world.getBlockState(offset).getBlock();
-            if(block == Blocks.WATER || block == Blocks.FLOWING_WATER)
-                temp -= 1;
-            else if(block == Blocks.LAVA || block == Blocks.FLOWING_LAVA)
-                temp += 1.2;
-            else if(block == Blocks.FIRE)
+            if(world.getBlockState(offset).getBlock() == Blocks.FIRE)
                 temp += 0.6;
+            else {
+                Fluid fluid = WorldUtils.getFluid(world, offset);
+                if(fluid != null && handleLiquid)
+                    temp = (temp + fluid.getTemperature()) / 2;
+            }
         }
 
         if(world.isDaytime() && world.canBlockSeeSky(upOffset))

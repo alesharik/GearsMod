@@ -103,7 +103,7 @@ public final class BasicSteamBoilerTileEntity extends FieldTileEntity implements
         steamHandler = SteamNetworkHandler.getStorageForBlock(world, pos, 1000, 1200 * 1000 * 1000, aDouble -> ModLoggerHolder.getModLogger().log(Level.ERROR, "Ok"));
         steamHandler.getNetwork().initBlock(pos);
 
-        minTemperature = BiomeTemperatureManager.getTemperatureManager(world.getBiome(pos), world).getTemperatureSmart(world, pos);
+        minTemperature = BiomeTemperatureManager.getTemperatureManager(world.getBiome(pos), world).getTemperatureSmart(world, pos, false);
         temperature = minTemperature;
     }
 

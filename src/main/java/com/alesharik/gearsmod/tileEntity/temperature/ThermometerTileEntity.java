@@ -44,7 +44,7 @@ public final class ThermometerTileEntity extends TileEntity implements ITickable
             maxTemperature = temperatureProvider.getMaxTemperature();
         } else {
             maxTemperature = 100;
-            temperature = BiomeTemperatureManager.getTemperatureManager(world.getBiome(pos), world).getTemperatureSmart(world, pos);
+            temperature = BiomeTemperatureManager.getTemperatureManager(world.getBiome(pos), world).getTemperatureSmart(world, pos, true);
         }
     }
 

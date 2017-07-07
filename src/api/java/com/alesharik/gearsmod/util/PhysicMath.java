@@ -90,4 +90,14 @@ public final class PhysicMath {
             return 0;
         return v;
     }
+
+    /**
+     * MTU(Minecraft Temperature Unit) == 10 F
+     *
+     * @param mtu mtu value
+     * @return Celsius value
+     */
+    public static double mtuToCelsius(double mtu) {
+        return (mtu * 100 - 32) / 1.8;
+    }
 }

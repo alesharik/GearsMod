@@ -90,7 +90,11 @@ public final class ItemOverlaysRenderer {
             if(timeDelta > 50) {
                 lastTimeStamp = newTimeStamp;
                 BlockPos playerPosition = minecraft.player.getPosition();
-                double temperature = BiomeTemperatureManager.getTemperatureManager(minecraft.world.getBiome(playerPosition), minecraft.world).getTemperatureSmart(minecraft.world, playerPosition);
+                double temperature = BiomeTemperatureManager.getTemperatureManager(minecraft.world.getBiome(playerPosition), minecraft.world).getTemperatureSmart(minecraft.world, playerPosition, true);
+                if(temperature < -33)
+                    temperature = -33;
+                else if(temperature > 100)
+                    temperature = 100;
 
                 int currentMeterHeight = (int) (53 * (temperature + 33) / 133);
 

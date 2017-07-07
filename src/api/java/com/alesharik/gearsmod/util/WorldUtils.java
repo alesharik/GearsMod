@@ -21,7 +21,12 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidUtil;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 
+import javax.annotation.Nullable;
 import java.util.function.Function;
 
 public final class WorldUtils {
@@ -41,5 +46,16 @@ public final class WorldUtils {
             tileEntity.validate();
             world.setTileEntity(pos, tileEntity);
         }
+    }
+
+
+    @Nullable
+    public static Fluid getFluid(World world, BlockPos pos) {
+        IFluidHandler handler = FluidUtil.getFluidHandler(world, pos, null);
+        if(handler != null) {
+            FluidStack stack = handler.drain(Fluid.BUCKET_VOLUME, false);
+            return stack != null ? stack.getFluid() : null;
+        }
+        return null;
     }
 }
