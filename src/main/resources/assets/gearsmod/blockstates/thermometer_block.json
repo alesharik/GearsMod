@@ -1,7 +1,6 @@
 {
   "forge_marker": 1,
   "defaults": {
-      "model": "gearsmod:temperature/thermometer.obj"
   },
   "variants": {
     "facing": {

@@ -42,9 +42,9 @@ public final class ThermometerFastTESR extends FastTESR<ThermometerTileEntity> {
         try {
             OBJModel m = (OBJModel) ModelLoaderRegistry.getModel(new ResourceLocation("gearsmod:block/temperature/thermometer.obj"));
             m.getMatLib().getGroups().remove(OBJModel.Group.DEFAULT_NAME);
-            model = m.bake(m.getDefaultState(), DefaultVertexFormats.BLOCK, input -> {
+            model = m.bake(m.getDefaultState(), DefaultVertexFormats.ITEM, input -> {
                 assert input != null;
-                return Minecraft.getMinecraft().getTextureMapBlocks().registerSprite(input);
+                return Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(input.toString());
             });
         } catch (Exception e) {
             e.printStackTrace();

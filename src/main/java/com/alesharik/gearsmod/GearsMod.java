@@ -25,6 +25,8 @@ import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -105,6 +107,12 @@ public class GearsMod {
         CommonProxy.getProxy().postInit(event);
 
         getModLogger().debug("PostInit stage completed!");
+    }
+
+    @SubscribeEvent
+    @SideOnly(Side.CLIENT)
+    public void textureStitchPre(TextureStitchEvent.Pre event) {//TODO remove
+        event.getMap().registerSprite(new ResourceLocation("gearsmod", "blocks/temperature/thermometer_map"));
     }
 
     @SubscribeEvent
