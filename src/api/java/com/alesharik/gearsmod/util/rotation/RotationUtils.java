@@ -27,6 +27,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraftforge.client.model.obj.OBJModel;
 import net.minecraftforge.client.model.pipeline.UnpackedBakedQuad;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -36,6 +37,7 @@ import javax.annotation.Nullable;
 import javax.vecmath.Point4f;
 import javax.vecmath.Tuple4f;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -66,6 +68,11 @@ public final class RotationUtils {
 
     @SideOnly(Side.CLIENT)
     public static IBakedModel rotateModel(IBakedModel model, TransformationMatrix rotationMatrix, IBlockState state) {
+        if(model instanceof OBJModel.OBJBakedModel)
+            return new WrapperBakedModel(model, Stream.of(model.getQuads(state, null, 0))
+                    .flatMap(Collection::stream)
+                    .map(bakedQuads -> rotateQuad(bakedQuads, rotationMatrix))
+                    .toArray(BakedQuad[]::new));
         return new WrapperBakedModel(model, Stream.of(EnumFacing.values())
                 .flatMap(side -> model.getQuads(state, side, 0).stream())
                 .map(quad -> rotateQuad(quad, rotationMatrix))

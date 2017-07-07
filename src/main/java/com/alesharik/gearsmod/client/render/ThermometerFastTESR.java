@@ -18,18 +18,18 @@
 package com.alesharik.gearsmod.client.render;
 
 import com.alesharik.gearsmod.tileEntity.temperature.ThermometerTileEntity;
-import com.alesharik.gearsmod.util.rotation.RotationUtils;
-import com.alesharik.gearsmod.util.rotation.TransformationMatrix;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.client.model.animation.FastTESR;
+import net.minecraftforge.client.model.obj.OBJModel;
 
 import javax.annotation.Nonnull;
-import javax.vecmath.Vector3f;
 
 public final class ThermometerFastTESR extends FastTESR<ThermometerTileEntity> {
     @Override
@@ -38,8 +38,21 @@ public final class ThermometerFastTESR extends FastTESR<ThermometerTileEntity> {
         buffer.setTranslation(x - pos.getX(), y - pos.getY(), z - pos.getZ());
 
         BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
-        IBakedModel model = dispatcher.getBlockModelShapes().getModelForState(te.getWorld().getBlockState(pos.offset(EnumFacing.NORTH)));
-        IBakedModel rotated = RotationUtils.rotateModel(model, new TransformationMatrix().beginPivotPoint(new Vector3f(0.5F, 0.5F, 0.5F)).withRotateY(90).endPivotPoint(new Vector3f(0.5F, 0.5F, 0.5F)), te.getWorld().getBlockState(pos));
-        dispatcher.getBlockModelRenderer().renderModel(te.getWorld(), rotated, te.getWorld().getBlockState(pos), pos, buffer, false);
+        IBakedModel model;
+        try {
+            OBJModel m = (OBJModel) ModelLoaderRegistry.getModel(new ResourceLocation("gearsmod:block/temperature/thermometer.obj"));
+            m.getMatLib().getGroups().remove(OBJModel.Group.DEFAULT_NAME);
+            model = m.bake(m.getDefaultState(), DefaultVertexFormats.BLOCK, input -> {
+                assert input != null;
+                return Minecraft.getMinecraft().getTextureMapBlocks().registerSprite(input);
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+//        model = dispatcher.getBlockModelShapes().getModelForState(te.getWorld().getBlockState(pos.offset(EnumFacing.NORTH)));
+//        IBakedModel rotated = RotationUtils.rotateModel(model, new TransformationMatrix().beginPivotPoint(new Vector3f(0.5F, 0.5F, 0.5F)).endPivotPoint(new Vector3f(0.5F, 0.5F, 0.5F)), te.getWorld().getBlockState(pos));
+        dispatcher.getBlockModelRenderer().renderModel(te.getWorld(), model, te.getWorld().getBlockState(pos), pos, buffer, false);
+
     }
 }

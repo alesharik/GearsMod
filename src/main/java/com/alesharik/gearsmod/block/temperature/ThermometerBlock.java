@@ -60,6 +60,6 @@ public final class ThermometerBlock extends BlockMachine {
     @Nonnull
     @Override
     public EnumBlockRenderType getRenderType(IBlockState state) {
-        return EnumBlockRenderType.INVISIBLE;
+        return EnumBlockRenderType.MODEL;
     }
 }
