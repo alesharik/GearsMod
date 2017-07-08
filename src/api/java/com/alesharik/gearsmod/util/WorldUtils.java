@@ -34,10 +34,16 @@ public final class WorldUtils {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Change blockState, but keep and update tileEntity
+     */
     public static void changeBlockState(World world, BlockPos pos, Function<IBlockState, IBlockState> replacer) {
         TileEntity tileEntity = world.getTileEntity(pos);
 
-        world.setBlockState(pos, replacer.apply(world.getBlockState(pos)));
+        IBlockState oldBlockState = world.getBlockState(pos);
+        IBlockState newBlockState = replacer.apply(oldBlockState);
+
+        world.setBlockState(pos, newBlockState);
         TileEntity newTileEntity = world.getTileEntity(pos);
         if(newTileEntity != null)
             newTileEntity.invalidate();
@@ -45,6 +51,7 @@ public final class WorldUtils {
         if(tileEntity != null) {
             tileEntity.validate();
             world.setTileEntity(pos, tileEntity);
+            world.markAndNotifyBlock(pos, world.getChunkFromBlockCoords(pos), oldBlockState, newBlockState, 3);
         }
     }
 

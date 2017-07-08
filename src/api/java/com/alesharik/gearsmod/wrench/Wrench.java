@@ -15,16 +15,37 @@
  *     along with GearsMod.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.alesharik.gearsmod.material;
+package com.alesharik.gearsmod.wrench;
 
-import net.minecraft.block.material.MapColor;
-import net.minecraft.block.material.Material;
+import net.minecraft.item.ItemStack;
 
-/**
- * Wrench can easily remove block with this material
- */
-public class WrenchableMaterial extends Material {
-    public WrenchableMaterial(MapColor color) {
-        super(color);
+public interface Wrench {
+    /**
+     * Damage wrench for 1 point
+     */
+    default void damageWrench() {
+        damageWrench(1);
+    }
+
+    /**
+     * Damage wrench for delta points
+     */
+    void damageWrench(int delta);
+
+    /**
+     * Return wrench damage
+     */
+    int getWrenchDamage();
+
+    /**
+     * Return wrench ItemStack
+     */
+    ItemStack getItemStack();
+
+    Tier getTier();
+
+    enum Tier {
+        BASIC,
+        ADVANCED
     }
 }

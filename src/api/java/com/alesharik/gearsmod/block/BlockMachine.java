@@ -17,6 +17,9 @@
 
 package com.alesharik.gearsmod.block;
 
+import com.alesharik.gearsmod.wrench.Rotatable;
+import com.alesharik.gearsmod.wrench.Rotator;
+import com.alesharik.gearsmod.wrench.rotator.HorizontalRotator;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.material.Material;
@@ -38,7 +41,7 @@ import javax.annotation.Nonnull;
 /**
  * All machines have {@link EnumBlockRenderType#MODEL} rendering by default
  */
-public abstract class BlockMachine extends BlockContainer {
+public abstract class BlockMachine extends BlockContainer implements Rotatable {
     public static final PropertyDirection FACING = BlockHorizontal.FACING;
     public static final PropertyBool WORKING_PROPERTY = PropertyBool.create("working");
 
@@ -117,5 +120,15 @@ public abstract class BlockMachine extends BlockContainer {
     @Override
     public EnumBlockRenderType getRenderType(IBlockState state) {
         return EnumBlockRenderType.MODEL;
+    }
+
+    @Override
+    public boolean canRotate(World world, BlockPos pos, IBlockState state) {
+        return true;
+    }
+
+    @Override
+    public Rotator getRotator() {
+        return HorizontalRotator.getInstance();
     }
 }

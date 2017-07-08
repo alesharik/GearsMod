@@ -24,6 +24,7 @@ import com.alesharik.gearsmod.material.ModMaterials;
 import com.alesharik.gearsmod.steam.SteamStorageProvider;
 import com.alesharik.gearsmod.tileEntity.steam.BasicSteamPipeTileEntity;
 import com.alesharik.gearsmod.util.rotation.RotationUtils;
+import com.alesharik.gearsmod.wrench.Wrenchable;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
@@ -42,7 +43,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Map;
 
-public final class BasicSteamPipe extends BlockPipe {
+public final class BasicSteamPipe extends BlockPipe implements Wrenchable {
     private static final Map<EnumFacing, IProperty<Boolean>> CONNECTION_PROPERTIES_MAP = ConnectionProperties.CONNECTIONS;
     private static final AxisAlignedBB BASE_AABB = new AxisAlignedBB(4 / 16D, 4 / 16D, 4 / 16D, 12 / 16D, 12 / 16D, 12 / 16D);
     private static final AxisAlignedBB SIDE_CONNECTION_AABB = new AxisAlignedBB(4 / 16D, 0 / 16D, 4 / 16D, 12 / 16D, 4 / 16D, 12 / 16D);

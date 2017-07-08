@@ -21,6 +21,7 @@ import com.alesharik.gearsmod.GearsMod;
 import com.alesharik.gearsmod.block.BlockMachine;
 import com.alesharik.gearsmod.gui.ModGuis;
 import com.alesharik.gearsmod.tileEntity.steam.BasicSteamBoilerTileEntity;
+import com.alesharik.gearsmod.wrench.Wrenchable;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -39,7 +40,7 @@ import net.minecraftforge.items.IItemHandler;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 
-public final class BasicSteamBoiler extends BlockMachine {
+public final class BasicSteamBoiler extends BlockMachine implements Wrenchable {
     public BasicSteamBoiler() {
         super(Material.IRON);
         this.setUnlocalizedName("basic_steam_boiler");

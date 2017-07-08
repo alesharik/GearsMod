@@ -18,6 +18,7 @@
 package com.alesharik.gearsmod.item;
 
 import com.alesharik.gearsmod.block.ModBlocks;
+import com.alesharik.gearsmod.wrench.WrenchManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemModelMesher;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -39,6 +40,7 @@ public final class ModItems {
     public static ItemBlock THERMOMETER_BLOCK_ITEM;
 
     public static PortableThermometer PORTABLE_THERMOMETER;
+    public static BasicItemWrench BASIC_WRENCH;
 
     private ModItems() {
     }
@@ -88,6 +90,10 @@ public final class ModItems {
 
         PORTABLE_THERMOMETER = new PortableThermometer();
         registry.register(PORTABLE_THERMOMETER);
+
+        BASIC_WRENCH = new BasicItemWrench();
+        WrenchManager.registerFactory(new BasicItemWrench.WrenchWrapperFactory());
+        registry.register(BASIC_WRENCH);
     }
 
     @SideOnly(Side.CLIENT)
@@ -104,5 +110,7 @@ public final class ModItems {
         modelMesher.register(PORTABLE_THERMOMETER, 0, new ModelResourceLocation("gearsmod:portable_thermometer", "inventory"));
         modelMesher.register(PORTABLE_THERMOMETER, 1, new ModelResourceLocation("gearsmod:portable_thermometer", "inventory"));
         modelMesher.register(PORTABLE_THERMOMETER, 2, new ModelResourceLocation("gearsmod:portable_thermometer", "inventory"));
+
+        modelMesher.register(BASIC_WRENCH, 0, new ModelResourceLocation("gearsmod:basic_wrench", "inventory"));
     }
 }

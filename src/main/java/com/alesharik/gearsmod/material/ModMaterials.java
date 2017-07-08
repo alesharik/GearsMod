@@ -17,6 +17,7 @@
 
 package com.alesharik.gearsmod.material;
 
+import com.alesharik.gearsmod.wrench.WrenchableMaterial;
 import net.minecraft.block.material.MapColor;
 
 public final class ModMaterials {
