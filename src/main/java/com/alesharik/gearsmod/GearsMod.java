@@ -19,6 +19,7 @@ package com.alesharik.gearsmod;
 
 import com.alesharik.gearsmod.block.ModBlocks;
 import com.alesharik.gearsmod.proxy.CommonProxy;
+import com.alesharik.gearsmod.util.BigTextureAtlasSprite;
 import com.alesharik.gearsmod.util.ModLoggerHolder;
 import com.alesharik.gearsmod.util.ModSecurityManager;
 import net.minecraft.block.Block;
@@ -53,9 +54,8 @@ public class GearsMod {
             return new ItemStack(ModBlocks.SMALL_BRICKS_BLOCK);
         }
     };
-
+    public static BigTextureAtlasSprite texture;
     private static SimpleNetworkWrapper networkWrapper;
-
     @Mod.Instance
     private static GearsMod instance;
 

@@ -31,6 +31,7 @@ import com.alesharik.gearsmod.integration.theoneprobe.TheOneProbeIntegrationModu
 import com.alesharik.gearsmod.item.ItemOverlaysRenderer;
 import com.alesharik.gearsmod.item.ModItems;
 import com.alesharik.gearsmod.tileEntity.ModTileEntities;
+import com.alesharik.gearsmod.tileEntity.temperature.ThermometerTileEntity;
 import com.alesharik.gearsmod.util.ExecutionUtils;
 import com.alesharik.gearsmod.util.field.SimpleTileEntityFieldStore;
 import net.minecraft.block.Block;
@@ -79,6 +80,7 @@ public class CommonProxy implements ExecutionUtils.Executor, CurrentWorldProvide
         networkWrapper.registerMessage(SmokeChangeMessage.Handler.class, SmokeChangeMessage.class, 1, Side.SERVER);
         networkWrapper.registerMessage(FluidSynchronizationMessage.Handler.class, FluidSynchronizationMessage.class, 2, Side.SERVER);
         networkWrapper.registerMessage(RequestFluidSynchronizationMessage.Handler.class, RequestFluidSynchronizationMessage.class, 3, Side.SERVER);
+        networkWrapper.registerMessage(ThermometerTileEntity.UpdateMessage.Handler.class, ThermometerTileEntity.UpdateMessage.class, 4, Side.SERVER);
         IntegrationManager.init();
     }
 
@@ -123,6 +125,7 @@ public class CommonProxy implements ExecutionUtils.Executor, CurrentWorldProvide
             networkWrapper.registerMessage(SmokeChangeMessage.Handler.class, SmokeChangeMessage.class, 1, Side.CLIENT);
             networkWrapper.registerMessage(FluidSynchronizationMessage.Handler.class, FluidSynchronizationMessage.class, 2, Side.CLIENT);
             networkWrapper.registerMessage(RequestFluidSynchronizationMessage.Handler.class, RequestFluidSynchronizationMessage.class, 3, Side.CLIENT);
+            networkWrapper.registerMessage(ThermometerTileEntity.UpdateMessage.Handler.class, ThermometerTileEntity.UpdateMessage.class, 4, Side.CLIENT);
 
             ModItems.clientRegister();
             ModTileEntities.clientRegister();
